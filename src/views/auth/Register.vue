@@ -14,7 +14,7 @@ const email = ref('')
 const password = ref('')
 const age = ref('')
 const createdBy = ref('system')
-const addressId = ref(1) // ose nga dropdown
+const addressId = ref(1)
 const role = ref('USER')
 
 const handleRegister = async () => {
@@ -40,38 +40,166 @@ const handleRegister = async () => {
     toast.showError(error.response?.data?.message || 'Registration failed')
   }
 }
-await router.push({ name: 'login' })
 </script>
 
 <template>
-  <div class="container">
-    <form @submit.prevent="handleRegister" class="mt-5 w-50 mx-auto">
-      <h2>Sign Up</h2>
-      <div class="mb-3">
-        <label>Name</label>
-        <input v-model="name" class="form-control" />
-      </div>
-      <div class="mb-3">
-        <label>Surname</label>
-        <input v-model="surname" class="form-control" />
-      </div>
-      <div class="mb-3">
-        <label>Email</label>
-        <input v-model="email" class="form-control" type="email" />
-      </div>
-      <div class="mb-3">
-        <label>Password</label>
-        <input v-model="password" class="form-control" type="password" />
-      </div>
-      <div class="mb-3">
-        <label>Age</label>
-        <input v-model="age" class="form-control" type="number" />
-      </div>
-      <div class="mb-3">
-        <label>Address ID</label>
-        <input v-model="addressId" class="form-control" type="number" />
-      </div>
-      <button class="btn btn-primary">Register</button>
-    </form>
+  <div class="signup-wrapper">
+    <div class="signup-card shadow-sm">
+      <h2 class="mb-4 text-center">Create Your Account</h2>
+      <form @submit.prevent="handleRegister" novalidate>
+        <div class="form-group mb-3">
+          <label for="name">Name <span class="text-danger">*</span></label>
+          <input
+              v-model="name"
+              id="name"
+              type="text"
+              class="form-control"
+              placeholder="Your first name"
+              required
+              autocomplete="given-name"
+          />
+        </div>
+
+        <div class="form-group mb-3">
+          <label for="surname">Surname</label>
+          <input
+              v-model="surname"
+              id="surname"
+              type="text"
+              class="form-control"
+              placeholder="Your last name"
+              autocomplete="family-name"
+          />
+        </div>
+
+        <div class="form-group mb-3">
+          <label for="email">Email <span class="text-danger">*</span></label>
+          <input
+              v-model="email"
+              id="email"
+              type="email"
+              class="form-control"
+              placeholder="example@mail.com"
+              required
+              autocomplete="email"
+          />
+        </div>
+
+        <div class="form-group mb-3">
+          <label for="password">Password <span class="text-danger">*</span></label>
+          <input
+              v-model="password"
+              id="password"
+              type="password"
+              class="form-control"
+              placeholder="Create a password"
+              required
+              autocomplete="new-password"
+          />
+        </div>
+
+        <div class="form-group mb-3">
+          <label for="age">Age</label>
+          <input
+              v-model="age"
+              id="age"
+              type="number"
+              min="0"
+              class="form-control"
+              placeholder="Your age"
+          />
+        </div>
+
+        <div class="form-group mb-3">
+          <label for="addressId">Address ID</label>
+          <input
+              v-model="addressId"
+              id="addressId"
+              type="number"
+              min="1"
+              class="form-control"
+              placeholder="Address ID"
+          />
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">
+          Register
+        </button>
+      </form>
+
+      <p class="text-center mt-3">
+        Already have an account?
+        <router-link to="/auth/login" class="text-primary text-decoration-none">
+          Log in here
+        </router-link>
+      </p>
+    </div>
   </div>
 </template>
+
+<style scoped>
+.signup-wrapper {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  padding: 1rem;
+}
+
+.signup-card {
+  background-color: #fff;
+  border-radius: 12px;
+  max-width: 420px;
+  width: 100%;
+  padding: 2.5rem 2rem;
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+  transition: box-shadow 0.3s ease;
+}
+
+.signup-card:hover {
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
+}
+
+.form-control {
+  border-radius: 8px;
+  padding: 0.625rem 0.75rem;
+  font-size: 1rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-control:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 8px rgba(102, 126, 234, 0.6);
+  outline: none;
+}
+
+label {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.btn-primary {
+  background: #667eea;
+  border: none;
+  font-size: 1.1rem;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background: #5a67d8;
+  box-shadow: 0 0 12px rgba(90, 103, 216, 0.7);
+  outline: none;
+}
+
+p {
+  font-size: 0.9rem;
+}
+
+.text-primary:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+</style>

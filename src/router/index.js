@@ -1,52 +1,49 @@
-import AuthView from "@/views/auth/AuthView.vue"
-import {createRouter, createWebHistory} from "vue-router";
-import HomeView from "@/components/ui/HomeView.vue";
-import Register from "@/views/auth/Register.vue";
-import {useAuthStore} from "@/stores/authStore.js";
+import {createRouter, createWebHistory} from 'vue-router';
+import {useAuthStore} from '@/stores/authStore.js';
+
+import AuthView from '@/views/auth/AuthView.vue';     // your login view
+import Register from '@/views/auth/Register.vue';     // your register view
+import HomeView from '@/components/ui/HomeView.vue';  // your home view
 
 const routes = [
     {
-        path: '/auth',
+        path: '/auth/login',
+        name: 'login',
         component: AuthView,
-        children: [
-            {
-                path: 'login',
-                name: 'login',
-                component: AuthView,
-                meta: { requiresAuth: false }
-            },
-            {
-                path: 'register',
-                name: 'register',
-                component: Register,
-                meta: { requiresAuth: false }
-            }
-        ]
-    }, {
-        path: "/",
-        name: "home",
+        meta: {requiresAuth: false}
+    },
+    {
+        path: '/auth/register',
+        name: 'register',
+        component: Register,
+        meta: {requiresAuth: false}
+    },
+    {
+        path: '/',
+        name: 'home',
         component: HomeView,
-        meta: {
-            requiresAuth: true
-        }
+        meta: {requiresAuth: true}
     }
 ];
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
-    routes,
+    routes
 });
-router.beforeEach((to, from, next) => {
-    const authStore = useAuthStore()
 
-    if (to.meta.requiresAuth && !authStore.isLoggedIn) {
-        return next({ name: 'login' })
+// Navigation guard
+router.beforeEach((to, from, next) => {
+    const authStore = useAuthStore();
+
+    if (to.meta.requiresAuth       && !authStore.isLoggedIn) {
+        return next({name: 'login'});
     }
 
     if (!to.meta.requiresAuth && authStore.isLoggedIn && (to.name === 'login' || to.name === 'register')) {
-        return next({ name: 'home' })
+        return next({name: 'home'});
     }
 
-    next()
-})
-export default router
+    next();
+});
+
+export default router;

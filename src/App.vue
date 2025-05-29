@@ -1,4 +1,3 @@
-
 <script setup>
 import ErrorBoundary from "@/components/shared/ErrorBoundary.vue";
 import AuthView from "@/views/auth/AuthView.vue";
@@ -10,8 +9,8 @@ const authStore = useAuthStore();
 <template>
   <error-boundary>
     <!-- Keto dy komponenta renderohen te error boundary -->
-    <auth-view v-if="!authStore.isLoggedIn"/>
-    <the-layout v-else/>
+    <router-view/>
+
   </error-boundary>
 </template>
 
