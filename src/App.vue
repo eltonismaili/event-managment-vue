@@ -4,12 +4,14 @@ import AuthView from "@/views/auth/AuthView.vue";
 import TheLayout from "@/components/ui/TheLayout.vue";
 import {useAuthStore} from "@/stores/authStore.js";
 
+
 const authStore = useAuthStore();
 </script>
 <template>
   <error-boundary>
-    <!-- Keto dy komponenta renderohen te error boundary -->
-    <router-view/>
+
+      <router-view/>
+
 
   </error-boundary>
 </template>

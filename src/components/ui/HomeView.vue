@@ -1,5 +1,4 @@
 <template>
-  <TheLayout>
     <div class="container">
       <h1 class="display-5 mb-4">Welcome to Event Manager 🎉</h1>
       <p class="lead mb-5">Manage your concerts, festivals, and more!</p>
@@ -36,7 +35,6 @@
         </div>
       </div>
     </div>
-  </TheLayout>
 </template>
 
 <script setup>

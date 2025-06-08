@@ -4,6 +4,7 @@
     <div class="d-flex">
       <TheSidebar />
       <main class="flex-fill p-4 layout-bg">
+        <router-view/>
         <slot /> <!-- Përmbajtja e faqes shfaqet këtu -->
       </main>
     </div>
