@@ -24,7 +24,7 @@ export const useAuthStore = defineStore('auth', () => {
 
     // 🆕 SIGNUP (REGISTER)
     const signUp = async (userData) => {
-        const response = await client.post('auth/register', userData);
+        const response = await client.post('users/register', userData);
         return response.data;
     };
 
