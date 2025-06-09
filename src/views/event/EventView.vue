@@ -61,12 +61,11 @@ const fetchEvents = async () => {
 }
 
 function handleAdd() {
-  router.push({ name: 'event-create' }) // ✅ navigate to event creation page
+  router.push({ name: 'event-create' }) // Navigate to event creation page
 }
 
 function handleUpdate(id) {
-  alert(`Update event with id ${id}`)
-  // router.push({ name: 'event-update', params: { id } })
+  router.push({ name: 'event-update', params: { id } }) // Navigate to event update page
 }
 
 async function handleDelete(id) {
