@@ -1,189 +1,245 @@
 <template>
-  <div class="container mt-5">
-    <h2 class="mb-4">Create New Event</h2>
+  <form @submit.prevent="submitForm">
+    <h2>Create Event</h2>
 
-    <form @submit.prevent="handleSubmit">
-      <div class="mb-3">
-        <label for="name" class="form-label">Event Name</label>
-        <input
-            id="name"
-            v-model="form.name"
-            type="text"
-            class="form-control"
-            required
-        />
-      </div>
+    <!-- Event Basic Info -->
+    <div>
+      <label>Event Name:</label>
+      <input v-model="form.name" type="text" />
+      <span v-if="errors.name">{{ errors.name }}</span>
+    </div>
 
-      <div class="mb-3">
-        <label for="description" class="form-label">Description</label>
-        <textarea
-            id="description"
-            v-model="form.description"
-            class="form-control"
-            rows="3"
-        ></textarea>
-      </div>
+    <div>
+      <label>Description:</label>
+      <textarea v-model="form.description"></textarea>
+      <span v-if="errors.description">{{ errors.description }}</span>
+    </div>
 
-      <div class="mb-3">
-        <label for="startDate" class="form-label">Start Date</label>
-        <input
-            id="startDate"
-            v-model="form.startDate"
-            type="datetime-local"
-            class="form-control"
-            required
-        />
-      </div>
+    <!-- UserDto -->
+    <fieldset>
+      <legend>User Info</legend>
+      <label>Name:</label>
+      <input v-model="form.user.name" type="text" />
+      <label>Surname:</label>
+      <input v-model="form.user.surname" type="text" />
+      <label>Email:</label>
+      <input v-model="form.user.email" type="email" />
+      <label>Password:</label>
+      <input v-model="form.user.password" type="password" />
+      <label>Age:</label>
+      <input v-model.number="form.user.age" type="number" />
+      <label>Role:</label>
+      <select v-model="form.user.roles">
+        <option value="ADMIN">ADMIN</option>
+        <option value="USER">USER</option>
+        <!-- Add your other roles -->
+      </select>
 
-      <div class="mb-3">
-        <label for="endDate" class="form-label">End Date</label>
-        <input
-            id="endDate"
-            v-model="form.endDate"
-            type="datetime-local"
-            class="form-control"
-            required
-        />
-      </div>
+      <!-- User Address -->
+      <fieldset>
+        <legend>User Address</legend>
+        <label>Zip Code:</label>
+        <input v-model="form.user.address.zipCode" type="text" />
+        <label>City:</label>
+        <input v-model="form.user.address.city" type="text" />
+        <label>Country:</label>
+        <input v-model="form.user.address.country" type="text" />
+        <label>Street:</label>
+        <input v-model="form.user.address.street" type="text" />
+      </fieldset>
+    </fieldset>
 
-      <div class="mb-3">
-        <label for="eventType" class="form-label">Event Type</label>
-        <select
-            id="eventType"
-            v-model="form.eventType"
-            class="form-select"
-            required
-        >
-          <option value="CONFERENCE">Conference</option>
-          <option value="MEETUP">Meetup</option>
-          <option value="WORKSHOP">Workshop</option>
-        </select>
-      </div>
+    <!-- Dates -->
+    <div>
+      <label>Start Date:</label>
+      <input v-model="form.startDate" type="datetime-local" />
+    </div>
+    <div>
+      <label>End Date:</label>
+      <input v-model="form.endDate" type="datetime-local" />
+    </div>
 
-      <!-- Category Select -->
-      <div class="mb-3">
-        <label for="category" class="form-label">Category</label>
-        <select
-            id="category"
-            v-model="form.categoryId.id"
-            class="form-select"
-            required
-        >
-          <option value="" disabled>Select category</option>
-          <option
-              v-for="cat in categories"
-              :key="cat.id"
-              :value="cat.id"
-          >
-            {{ cat.name }}
-          </option>
-        </select>
-      </div>
+    <div>
+      <label>Image URL:</label>
+      <input v-model="form.imageUrl" type="text" />
+    </div>
 
-      <!-- Venue Select -->
-      <div class="mb-3">
-        <label for="venue" class="form-label">Venue</label>
-        <select
-            id="venue"
-            v-model="form.venueId.id"
-            class="form-select"
-            required
-        >
-          <option value="" disabled>Select venue</option>
-          <option
-              v-for="venue in venues"
-              :key="venue.id"
-              :value="venue.id"
-          >
-            {{ venue.name }}
-          </option>
-        </select>
-      </div>
+    <!-- Event Type -->
+    <div>
+      <label>Event Type:</label>
+      <select v-model="form.eventType">
+        <option value="CONFERENCE">Conference</option>
+        <option value="MEETUP">Meetup</option>
+        <option value="WORKSHOP">Workshop</option>
+        <!-- Add your enum options -->
+      </select>
+    </div>
 
-      <button
-          type="submit"
-          class="btn btn-primary"
-          :disabled="isSubmitting"
-      >
-        {{ isSubmitting ? 'Saving...' : 'Create Event' }}
-      </button>
+    <!-- CategoryDto -->
+    <fieldset>
+      <legend>Category</legend>
+      <label>Name:</label>
+      <input v-model="form.category.name" type="text" />
+    </fieldset>
 
-      <div
-          v-if="error"
-          class="alert alert-danger mt-3"
-      >
-        {{ error }}
-      </div>
-    </form>
-  </div>
+    <!-- VenueDto -->
+    <fieldset>
+      <legend>Venue</legend>
+      <label>Name:</label>
+      <input v-model="form.venue.name" type="text" />
+      <label>Capacity:</label>
+      <input v-model.number="form.venue.capacity" type="number" />
+
+      <!-- Venue Address -->
+      <fieldset>
+        <legend>Venue Address</legend>
+        <label>Zip Code:</label>
+        <input v-model="form.venue.address.zipCode" type="text" />
+        <label>City:</label>
+        <input v-model="form.venue.address.city" type="text" />
+        <label>Country:</label>
+        <input v-model="form.venue.address.country" type="text" />
+        <label>Street:</label>
+        <input v-model="form.venue.address.street" type="text" />
+      </fieldset>
+    </fieldset>
+
+    <div>
+      <label>Created By:</label>
+      <input v-model="form.createdBy" type="text" />
+    </div>
+
+    <button type="submit">Create Event</button>
+  </form>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/authStore'
-import EventService from '@/services/eventService'
+import { reactive, ref } from 'vue';
 
-// Form state
-const form = ref({
+// Form data structure based on your DTOs
+const form = reactive({
+  id: null,
   name: '',
   description: '',
+  user: {
+    id: null,
+    name: '',
+    surname: '',
+    email: '',
+    password: '',
+    age: null,
+    roles: 'USER',
+    address: {
+      id: null,
+      zipCode: '',
+      city: '',
+      country: '',
+      street: '',
+    },
+  },
   startDate: '',
   endDate: '',
+  imageUrl: '',
   eventType: 'CONFERENCE',
-  userId: { id: null },      // will be set from auth store
-  categoryId: { id: null },  // selected by user
-  venueId: { id: null },     // selected by user
+  category: {
+    id: null,
+    name: '',
+  },
+  venue: {
+    id: null,
+    name: '',
+    capacity: null,
+    address: {
+      id: null,
+      zipCode: '',
+      city: '',
+      country: '',
+      street: '',
+    },
+  },
   createdBy: '',
-  createdAt: new Date().toISOString()
-})
+  createdAt: new Date().toISOString().slice(0, 16), // yyyy-MM-ddTHH:mm for datetime-local
+});
 
-const isSubmitting = ref(false)
-const error = ref(null)
-const router = useRouter()
+const errors = reactive({});
 
-const authStore = useAuthStore()
+function validate() {
+  errors.name = form.name.length < 2 || form.name.length > 50 ? 'Name must be between 2 and 50 characters' : '';
+  errors.description = form.description.length < 2 || form.description.length > 1000 ? 'Description must be between 2 and 1000 characters' : '';
+  errors.createdBy = form.createdBy.length < 2 || form.createdBy.length > 50 ? 'Created By must be between 2 and 50 characters' : '';
 
-// Mock categories and venues - replace with API calls if needed
-const categories = ref([
-  { id: 1, name: 'Conference' },
-  { id: 2, name: 'Meetup' },
-  { id: 3, name: 'Workshop' }
-])
+  // Add other validations for nested objects (User, Category, Venue, Address) as needed
 
-const venues = ref([
-  { id: 1, name: 'Venue A' },
-  { id: 2, name: 'Venue B' },
-  { id: 3, name: 'Venue C' }
-])
+  // Example validation for User name
+  errors.userName = form.user.name.length < 2 || form.user.name.length > 50 ? 'User name must be between 2 and 50 characters' : '';
 
-// On mounted, set logged-in user ID automatically
-onMounted(() => {
-  if (authStore.loggedInUser && authStore.loggedInUser.id) {
-    form.value.userId.id = authStore.loggedInUser.id
+  // Return true if no errors
+  return !errors.name && !errors.description && !errors.createdBy && !errors.userName;
+}
+
+function submitForm() {
+  if (!validate()) {
+    alert('Please fix errors');
+    return;
   }
-})
 
-async function handleSubmit() {
-  error.value = null
-  isSubmitting.value = true
+  // Build the payload as expected by your backend
+  const payload = {
+    name: form.name,
+    description: form.description,
+    userId: form.user,
+    startDate: new Date(form.startDate).toISOString(),
+    endDate: new Date(form.endDate).toISOString(),
+    imageUrl: form.imageUrl,
+    eventType: form.eventType,
+    categoryId: form.category,
+    venueId: form.venue,
+    createdBy: form.createdBy,
+    createdAt: new Date(form.createdAt).toISOString(),
+  };
 
-  try {
-    // Call your service to create event
-    await EventService.createEvent(form.value)
+  console.log('Submitting event:', payload);
 
-    alert('Event created successfully!')
-    router.push({ name: 'events' })  // Adjust route name as needed
-
-  } catch (err) {
-    console.error(err)
-    error.value = 'Failed to create event. Please check your input and try again.'
-  } finally {
-    isSubmitting.value = false
-  }
+  // Example: send data to API
+  // fetch('/api/v1/events', {
+  //   method: 'POST',
+  //   headers: { 'Content-Type': 'application/json' },
+  //   body: JSON.stringify(payload),
+  // })
+  //   .then(res => res.json())
+  //   .then(data => alert('Event created successfully'))
+  //   .catch(err => alert('Error creating event'));
 }
 </script>
 
 <style scoped>
-/* Add any component-specific styles here */
+form {
+  max-width: 600px;
+  margin: auto;
+}
+label {
+  display: block;
+  margin-top: 10px;
+}
+input, textarea, select {
+  width: 100%;
+  padding: 6px;
+  margin-top: 4px;
+}
+fieldset {
+  border: 1px solid #ccc;
+  margin: 10px 0;
+  padding: 10px;
+}
+legend {
+  font-weight: bold;
+}
+span {
+  color: red;
+  font-size: 0.8em;
+}
+button {
+  margin-top: 20px;
+  padding: 10px 15px;
+}
 </style>

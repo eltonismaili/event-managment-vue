@@ -16,7 +16,7 @@ class EventService {
     // Create a new event (send JSON)
     async createEvent(eventData) {
         // POST to your backend endpoint for creating events
-        const response = await client.post("api/v1/events", eventData);
+        const response = await client.post("events", eventData);
         return response.data;
     }
 
