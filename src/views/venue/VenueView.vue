@@ -1,7 +1,6 @@
 <template>
   <div class="container mt-4">
     <h2>Venues</h2>
-    <button @click="$router.push('/venues/create')" class="btn btn-primary mb-3">Create New Venue</button>
 
     <ul class="list-group">
       <li
@@ -9,12 +8,25 @@
           :key="venue.id"
           class="list-group-item d-flex justify-content-between align-items-center"
       >
-        <span @click="$router.push(`/venues/${venue.id}`)" style="cursor:pointer;">
+        <span @click="$router.push(`/venues/details/${venue.id}`)" style="cursor:pointer;">
           {{ venue.name }}
         </span>
         <div>
-          <button @click="$router.push(`/venues/update/${venue.id}`)" class="btn btn-sm btn-warning me-2">Edit</button>
-          <button @click="deleteVenue(venue.id)" class="btn btn-sm btn-danger">Delete</button>
+          <button
+              @click="$router.push(`/venues/details/${venue.id}`)"
+              class="btn btn-sm btn-info me-2"
+          >
+            View
+          </button>
+          <button
+              @click="$router.push(`/venues/update/${venue.id}`)"
+              class="btn btn-sm btn-warning me-2"
+          >
+            Edit
+          </button>
+          <button @click="deleteVenue(venue.id)" class="btn btn-sm btn-danger">
+            Delete
+          </button>
         </div>
       </li>
     </ul>

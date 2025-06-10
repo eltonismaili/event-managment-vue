@@ -17,7 +17,7 @@
 </template>
 
 <script setup>
-import {useRoute} from 'vue-router'
+import { useRoute } from 'vue-router'
 
 const route = useRoute()
 
@@ -26,6 +26,8 @@ const menuItems = [
   { label: "Events", icon: "bi bi-calendar-event", route: "/events" },
   { label: "Categories", icon: "bi bi-tags", route: "/categories" },
   { label: "Venues", icon: "bi bi-geo-alt", route: "/venues" },
+  { label: "Tickets", icon: "bi bi-ticket-perforated", route: "/tickets" },
+  { label: "Registrations", icon: "bi bi-file-check", route: "/registrations" }
 ]
 </script>
 

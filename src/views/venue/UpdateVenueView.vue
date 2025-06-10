@@ -7,6 +7,12 @@
         <input id="name" v-model="venue.name" type="text" class="form-control" required />
       </div>
 
+      <!-- New Capacity Field -->
+      <div class="mb-3">
+        <label for="capacity" class="form-label">Capacity</label>
+        <input id="capacity" v-model.number="venue.capacity" type="number" class="form-control" required min="1" />
+      </div>
+
       <h4>Address</h4>
       <div class="mb-3">
         <label for="street" class="form-label">Street</label>
@@ -40,8 +46,11 @@ const route = useRoute()
 const router = useRouter()
 
 const venue = ref({
+  id: null,
   name: '',
+  capacity: 0,
   address: {
+    id: null,
     street: '',
     city: '',
     country: '',
@@ -54,14 +63,7 @@ const fetchVenue = async () => {
     const id = route.params.id
     const data = await VenueService.getById(id)
     if (data) {
-      // Sigurohu që data ka formatin e pritur, veçanërisht 'address'
-      venue.value.name = data.name || ''
-      venue.value.address = data.address || {
-        street: '',
-        city: '',
-        country: '',
-        zipCode: ''
-      }
+      venue.value = data
     }
   } catch (err) {
     console.error('Failed to fetch venue:', err)
@@ -75,23 +77,23 @@ const handleSubmit = async () => {
       throw new Error("Venue ID is missing in route params")
     }
 
-    // Update address first
     if (venue.value.address && venue.value.address.id) {
       await AddressService.update(venue.value.address.id, venue.value.address)
     } else {
-      throw new Error("Address ID is missing, cannot update")
+      throw new Error("Address ID is missing, cannot update address")
     }
 
-    // Update venue with full address object or just addressId, varion sipas backend
     const venuePayload = {
+      id: venue.value.id,
       name: venue.value.name,
+      capacity: venue.value.capacity,
       address: venue.value.address
     }
 
     const updatedVenue = await VenueService.update(id, venuePayload)
 
     if (updatedVenue) {
-      await router.push('/venues')  // Redirect to venues list
+      await router.push('/venues')
     } else {
       console.error("Venue update failed: no data returned")
     }
@@ -99,8 +101,6 @@ const handleSubmit = async () => {
     console.error('Failed to update venue:', err)
   }
 }
-
-
 
 onMounted(fetchVenue)
 </script>

@@ -8,7 +8,9 @@ import TheLayout from "@/components/ui/TheLayout.vue";
 import eventRouter from './eventRouter.js'
 import homeRouter from "@/router/homeRouter.js";
 import categoryRouter from "@/router/categoryRouter.js";
-import venueRouter from "@/router/venueRouter.js"; // Importing event routes
+import venueRouter from "@/router/venueRouter.js";
+import ticketRouter from "@/router/ticketRouter.js";
+import registrationRouter from "@/router/registrationRouter.js"; // Importing event routes
 
 const routes = [
     {
@@ -31,7 +33,9 @@ const routes = [
             ...homeRouter,
             ...eventRouter,
             ...categoryRouter,
-            ...venueRouter
+            ...venueRouter,
+            ...ticketRouter,
+            ...registrationRouter
             // other authenticated routes go here
         ]
     }
