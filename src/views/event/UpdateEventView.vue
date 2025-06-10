@@ -171,7 +171,7 @@ async function loadEvent() {
     const event = await EventService.getEventById(eventId)
     form.value.name = event.name
     form.value.description = event.description
-    form.value.startDate = event.startDate.slice(0, 16) // format for datetime-local
+    form.value.startDate = event.startDate.slice(0, 16)
     form.value.endDate = event.endDate.slice(0, 16)
     form.value.imageUrl = event.imageUrl || ''
     form.value.eventType = event.eventType
@@ -197,7 +197,7 @@ function formatDateTimeLocal(date) {
       .slice(0, 16)
 }
 
-function onCategoryChange(e) {
+function onCategoryChange() {
   if (form.value.categoryId === '__new__') {
     creatingNewCategory.value = true
     form.value.categoryId = ''
@@ -226,7 +226,7 @@ async function createCategory() {
   }
 }
 
-function onVenueChange(e) {
+function onVenueChange() {
   if (form.value.venueId === '__new__') {
     creatingNewVenue.value = true
     form.value.venueId = ''
@@ -266,12 +266,12 @@ async function createVenue() {
 async function handleSubmit() {
   error.value = null
 
-  if (!form.value.categoryId) {
-    error.value = 'Please select or create a category'
+  if (!form.value.categoryId || isNaN(parseInt(form.value.categoryId))) {
+    error.value = 'Please select or create a valid category'
     return
   }
-  if (!form.value.venueId) {
-    error.value = 'Please select or create a venue'
+  if (!form.value.venueId || isNaN(parseInt(form.value.venueId))) {
+    error.value = 'Please select or create a valid venue'
     return
   }
 
@@ -279,37 +279,42 @@ async function handleSubmit() {
   const selectedVenue = venues.value.find(v => v.id === form.value.venueId)
 
   if (!selectedCategory || !selectedVenue) {
-    error.value = 'Invalid category or venue selected'
+    error.value = 'Selected category or venue is invalid'
     return
   }
 
+  isSubmitting.value = true
+
   const payload = {
-    name: form.value.name.trim(),
-    description: form.value.description.trim(),
-    startDate: form.value.startDate,
-    endDate: form.value.endDate,
-    imageUrl: form.value.imageUrl?.trim() || null,
+    name: form.value.name,
+    description: form.value.description,
+    userId: form.value.userId,
+    startDate: new Date(form.value.startDate).toISOString(),
+    endDate: new Date(form.value.endDate).toISOString(),
+    imageUrl: form.value.imageUrl,
     eventType: form.value.eventType,
     categoryId: form.value.categoryId,
     venueId: form.value.venueId,
-    user: { id: store.loggedInUser.id }
   }
 
-  isSubmitting.value = true
   try {
     if (isEdit) {
-      await EventService.updateEvent(eventId, payload)
+      await EventService.updateEvent(eventId, payload) // <--- fixed method name
       alert('Event updated successfully')
     } else {
       await EventService.createEvent(payload)
       alert('Event created successfully')
     }
-    await router.push('/events')
+    router.push({ name: 'EventList' }) // or wherever you want to go
   } catch (e) {
     console.error('Failed to submit event', e)
-    error.value = isEdit ? 'Failed to update event.' : 'Failed to create event.'
+    error.value = 'Failed to submit event. Please try again.'
   } finally {
     isSubmitting.value = false
   }
 }
 </script>
+
+<style scoped>
+/* Add any scoped CSS you need here */
+</style>

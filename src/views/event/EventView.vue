@@ -28,10 +28,14 @@
             <button @click="handleUpdate(event.id)" class="btn btn-sm btn-primary me-2">
               <i class="bi bi-pencil"></i> Update
             </button>
-            <button @click="handleDelete(event.id)" class="btn btn-sm btn-danger">
+            <button @click="handleDelete(event.id)" class="btn btn-sm btn-danger me-2">
               <i class="bi bi-trash"></i> Delete
             </button>
+            <button @click="handleViewDetails(event.id)" class="btn btn-sm btn-info">
+              <i class="bi bi-eye"></i> View Details
+            </button>
           </td>
+
         </tr>
         </tbody>
       </table>
@@ -58,6 +62,9 @@ const fetchEvents = async () => {
   } catch (error) {
     console.error('Failed to fetch events:', error)
   }
+}
+function handleViewDetails(id) {
+  router.push({ name: 'event-details', params: { id } }) // Navigate to event details page
 }
 
 function handleAdd() {

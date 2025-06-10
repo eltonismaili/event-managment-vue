@@ -22,9 +22,11 @@ import {useRoute} from 'vue-router'
 const route = useRoute()
 
 const menuItems = [
-  {label: "Home", icon: "bi bi-house", route: "/"},
-  {label: "Events", icon: "bi bi-calendar-event", route: "/events"},
-];
+  { label: "Home", icon: "bi bi-house", route: "/" },
+  { label: "Events", icon: "bi bi-calendar-event", route: "/events" },
+  { label: "Categories", icon: "bi bi-tags", route: "/categories" },
+  { label: "Venues", icon: "bi bi-geo-alt", route: "/venues" },
+]
 </script>
 
 <style scoped>

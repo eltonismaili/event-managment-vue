@@ -6,7 +6,9 @@ import Register from '@/views/auth/Register.vue'
 import HomeView from '@/components/ui/HomeView.vue'
 import TheLayout from "@/components/ui/TheLayout.vue";
 import eventRouter from './eventRouter.js'
-import homeRouter from "@/router/homeRouter.js"; // Importing event routes
+import homeRouter from "@/router/homeRouter.js";
+import categoryRouter from "@/router/categoryRouter.js";
+import venueRouter from "@/router/venueRouter.js"; // Importing event routes
 
 const routes = [
     {
@@ -28,6 +30,8 @@ const routes = [
         children: [
             ...homeRouter,
             ...eventRouter,
+            ...categoryRouter,
+            ...venueRouter
             // other authenticated routes go here
         ]
     }

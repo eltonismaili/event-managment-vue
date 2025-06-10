@@ -33,7 +33,7 @@
               <i class="bi bi-geo-alt-fill me-2 text-secondary"></i>
               {{ getVenueName(event.venueId) }}
             </p>
-            <button class="btn btn-outline-primary w-100">
+            <button class="btn btn-outline-primary w-100" @click="goToEventDetails(event.id)">
               View Details
             </button>
           </div>
@@ -45,11 +45,13 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import EventService from '@/services/eventService'
 import VenueService from '@/services/venueService'
 
 const events = ref([])
 const venues = ref([])
+const router = useRouter()
 
 const fetchData = async () => {
   try {
@@ -67,6 +69,12 @@ const getVenueName = (venueId) => {
 
 const formatDate = (date) => {
   return new Date(date).toLocaleDateString()
+}
+
+const goToEventDetails = (eventId) => {
+  router.push({ name: 'event-details', params: { id: eventId } })
+  // ose nëse route nuk ka emër:
+  // router.push(`/events/${eventId}`)
 }
 
 onMounted(fetchData)
