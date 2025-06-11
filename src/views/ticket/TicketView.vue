@@ -19,8 +19,8 @@
 
           <div class="ticket-body py-3">
             <p><strong>Quantity:</strong> {{ ticket.quantity }}</p>
-            <p><strong>Price:</strong> ${{ ticket.price.toFixed(2) }}</p>
-            <p><strong>Total:</strong> ${{ (ticket.quantity * ticket.price).toFixed(2) }}</p>
+            <p><strong>Price:</strong> ${{ (ticket.price ?? 0).toFixed(2) }}</p>
+            <p><strong>Total:</strong> ${{ (ticket.quantity * (ticket.price ?? 0)).toFixed(2) }}</p>
             <p><strong>Start:</strong> {{ formatDate(ticket.startDate) }}</p>
             <p><strong>End:</strong> {{ formatDate(ticket.endDate) }}</p>
             <p><strong>Buyer:</strong> {{ buyerName }}</p>
@@ -70,12 +70,14 @@ const fetchTickets = async () => {
     const allTickets = await TicketService.getAll()
     // Filter tickets by current user
     const userTickets = allTickets.filter(t => t.userId === currentUserId)
-    // Map eventId to eventName
+    // Map eventId to eventName and price from event
     tickets.value = userTickets.map(ticket => {
       const event = events.value.find(e => e.id === ticket.eventId)
       return {
         ...ticket,
         eventName: event ? event.name : 'Unknown Event',
+        // Use event.ticketPrice or event.price (adjust according to your event object)
+        price: event ? (event.ticketPrice ?? event.price ?? 0) : 0
       }
     })
   } catch (error) {

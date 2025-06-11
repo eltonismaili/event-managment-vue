@@ -1,6 +1,5 @@
 <template>
   <div class="container mt-5">
-    <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h2 class="h4 fw-bold text-primary">📅 Upcoming Events</h2>
       <button @click="handleAdd" class="btn btn-success">
@@ -8,43 +7,17 @@
       </button>
     </div>
 
-    <!-- Events Table -->
-    <div v-if="events.length" class="table-responsive">
-      <table class="table table-striped table-bordered align-middle">
-        <thead class="table-light">
-        <tr>
-          <th>Name</th>
-          <th>Start Date</th>
-          <th>Description</th>
-          <th style="width: 150px;">Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr v-for="event in events" :key="event.id">
-          <td>{{ event.name }}</td>
-          <td>{{ formatDate(event.startDate) }}</td>
-          <td>{{ event.description }}</td>
-          <td>
-            <button @click="handleUpdate(event.id)" class="btn btn-sm btn-primary me-2">
-              <i class="bi bi-pencil"></i> Update
-            </button>
-            <button @click="handleDelete(event.id)" class="btn btn-sm btn-danger me-2">
-              <i class="bi bi-trash"></i> Delete
-            </button>
-            <button @click="handleViewDetails(event.id)" class="btn btn-sm btn-info">
-              <i class="bi bi-eye"></i> View Details
-            </button>
-          </td>
-
-        </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- No Events -->
-    <div v-else class="alert alert-info mt-4">
-      No events found. Please add events to see them here.
-    </div>
+    <ItemTable
+        title="Events"
+        :items="events"
+        :columns="columns"
+        :enableUpdate="true"
+        :enableDelete="true"
+        :enableView="true"
+        @edit="handleUpdate"
+        @delete="handleDelete"
+        @view="handleViewDetails"
+    />
   </div>
 </template>
 
@@ -52,43 +25,70 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import EventService from '@/services/eventService'
+import ItemTable from "@/components/app/ItemTable.vue";
+import Swal from "sweetalert2";
 
 const router = useRouter()
 const events = ref([])
 
 const fetchEvents = async () => {
   try {
-    events.value = await EventService.getAllEvents()
+    const data = await EventService.getAllEvents()
+    events.value = data.map(event => ({
+      ...event,
+      startDate: new Date(event.startDate).toLocaleDateString()
+    }))
   } catch (error) {
     console.error('Failed to fetch events:', error)
   }
 }
-function handleViewDetails(id) {
-  router.push({ name: 'event-details', params: { id } }) // Navigate to event details page
-}
+
+const columns = [
+  { key: 'name', label: 'Name' },
+  { key: 'startDate', label: 'Start Date' },
+  { key: 'description', label: 'Description' },
+]
 
 function handleAdd() {
-  router.push({ name: 'event-create' }) // Navigate to event creation page
+  router.push({ name: 'event-create' })
 }
 
-function handleUpdate(id) {
-  router.push({ name: 'event-update', params: { id } }) // Navigate to event update page
+function handleUpdate(event) {
+  router.push({ name: 'event-update', params: { id: event.id } })
 }
 
-async function handleDelete(id) {
-  if (confirm('Are you sure you want to delete this event?')) {
+function handleViewDetails(event) {
+  router.push({ name: 'event-details', params: { id: event.id } })
+}
+
+async function handleDelete(event) {
+  const result = await Swal.fire({
+    title: 'Are you sure?',
+    text: "You won't be able to revert this!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Yes, delete it!'
+  })
+
+  if (result.isConfirmed) {
     try {
-      await EventService.deleteEvent(id)
-      events.value = events.value.filter(e => e.id !== id)
+      await EventService.deleteEvent(event.id)
+      events.value = events.value.filter(e => e.id !== event.id)
+
+      await Swal.fire(
+          'Deleted!',
+          'Your event has been deleted.',
+          'success'
+      )
     } catch (error) {
       console.error('Failed to delete event:', error)
+      Swal.fire('Error', 'Failed to delete event', 'error')
     }
   }
 }
 
-function formatDate(date) {
-  return new Date(date).toLocaleDateString()
-}
 
 onMounted(fetchEvents)
 </script>

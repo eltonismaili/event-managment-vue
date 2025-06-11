@@ -27,6 +27,12 @@
         <input v-model="form.endDate" type="datetime-local" id="endDate" class="form-control" required />
       </div>
 
+      <!-- Ticket Price -->
+      <div class="mb-3">
+        <label for="ticketPrice" class="form-label">Ticket Price ($)</label>
+        <input v-model.number="form.ticketPrice" type="number" min="0" step="0.01" id="ticketPrice" class="form-control" required />
+      </div>
+
       <!-- Image URL -->
       <div class="mb-3">
         <label for="imageUrl" class="form-label">Image URL</label>
@@ -69,16 +75,67 @@
           <option value="__new__">+ Create New Venue</option>
         </select>
 
-        <div v-else>
-          <input v-model="newVenue.name" type="text" class="form-control mb-2" placeholder="Venue name" />
+        <div v-else class="mt-3">
+          <label for="newVenueName" class="form-label">Venue Name</label>
+          <input
+              id="newVenueName"
+              v-model="newVenue.name"
+              type="text"
+              class="form-control"
+              placeholder="Venue name"
+          />
 
-          <input v-model="newVenue.address.street" type="text" class="form-control mb-2" placeholder="Street" />
-          <input v-model="newVenue.address.city" type="text" class="form-control mb-2" placeholder="City" />
-          <input v-model="newVenue.address.zipCode" type="text" class="form-control mb-2" placeholder="Zip Code" />
-          <input v-model="newVenue.address.country" type="text" class="form-control mb-2" placeholder="Country" />
+          <label for="venueCapacity" class="form-label mt-3">Venue Capacity</label>
+          <input
+              id="venueCapacity"
+              v-model.number="newVenue.capacity"
+              type="number"
+              min="1"
+              required
+              class="form-control"
+              placeholder="Enter capacity"
+          />
 
-          <button @click.prevent="createVenue" class="btn btn-sm btn-primary me-2">Save Venue</button>
-          <button @click.prevent="cancelNewVenue" class="btn btn-sm btn-secondary">Cancel</button>
+          <label class="form-label mt-3">Address</label>
+          <input
+              v-model="newVenue.address.street"
+              type="text"
+              class="form-control mb-2"
+              placeholder="Street"
+          />
+          <input
+              v-model="newVenue.address.city"
+              type="text"
+              class="form-control mb-2"
+              placeholder="City"
+          />
+          <input
+              v-model="newVenue.address.zipCode"
+              type="text"
+              class="form-control mb-2"
+              placeholder="Zip Code"
+          />
+          <input
+              v-model="newVenue.address.country"
+              type="text"
+              class="form-control"
+              placeholder="Country"
+          />
+
+          <button
+              type="button"
+              class="btn btn-secondary mt-2"
+              @click.prevent="createVenue"
+          >
+            Create Venue
+          </button>
+          <button
+              type="button"
+              class="btn btn-outline-secondary mt-2 ms-2"
+              @click.prevent="cancelNewVenue"
+          >
+            Cancel
+          </button>
         </div>
       </div>
 
@@ -100,6 +157,7 @@ import EventService from '@/services/eventService'
 import CategoryService from '@/services/categoryService'
 import VenueService from '@/services/venueService'
 import { useAuthStore } from '@/stores/authStore.js'
+import Swal from 'sweetalert2'
 
 const router = useRouter()
 const route = useRoute()
@@ -114,6 +172,7 @@ const form = ref({
   userId: store.loggedInUser.id,
   startDate: '',
   endDate: '',
+  ticketPrice: 0,
   imageUrl: '',
   eventType: 'CONFERENCE',
   categoryId: '',
@@ -132,6 +191,7 @@ const newCategoryName = ref('')
 const creatingNewVenue = ref(false)
 const newVenue = ref({
   name: '',
+  capacity: 0,
   address: {
     street: '',
     city: '',
@@ -173,6 +233,7 @@ async function loadEvent() {
     form.value.description = event.description
     form.value.startDate = event.startDate.slice(0, 16)
     form.value.endDate = event.endDate.slice(0, 16)
+    form.value.ticketPrice = event.ticketPrice || 0
     form.value.imageUrl = event.imageUrl || ''
     form.value.eventType = event.eventType
     form.value.categoryId = event.categoryId
@@ -211,7 +272,7 @@ function cancelNewCategory() {
 
 async function createCategory() {
   if (!newCategoryName.value.trim()) {
-    alert('Category name cannot be empty')
+    Swal.fire('Validation Error', 'Category name cannot be empty', 'warning')
     return
   }
   try {
@@ -220,9 +281,10 @@ async function createCategory() {
     form.value.categoryId = newCat.id
     creatingNewCategory.value = false
     newCategoryName.value = ''
+    Swal.fire('Success', 'Category created successfully', 'success')
   } catch (e) {
     console.error('Failed to create category', e)
-    alert('Failed to create category')
+    Swal.fire('Error', 'Failed to create category', 'error')
   }
 }
 
@@ -237,6 +299,7 @@ function cancelNewVenue() {
   creatingNewVenue.value = false
   newVenue.value = {
     name: '',
+    capacity: 0,
     address: {
       street: '',
       city: '',
@@ -248,7 +311,11 @@ function cancelNewVenue() {
 
 async function createVenue() {
   if (!newVenue.value.name.trim()) {
-    alert('Venue name cannot be empty')
+    Swal.fire('Validation Error', 'Venue name cannot be empty', 'warning')
+    return
+  }
+  if (newVenue.value.capacity < 1 || isNaN(newVenue.value.capacity)) {
+    Swal.fire('Validation Error', 'Capacity must be a positive number', 'warning')
     return
   }
   try {
@@ -257,9 +324,10 @@ async function createVenue() {
     form.value.venueId = newV.id
     creatingNewVenue.value = false
     cancelNewVenue()
+    Swal.fire('Success', 'Venue created successfully', 'success')
   } catch (e) {
     console.error('Failed to create venue', e)
-    alert('Failed to create venue')
+    Swal.fire('Error', 'Failed to create venue', 'error')
   }
 }
 
@@ -267,19 +335,15 @@ async function handleSubmit() {
   error.value = null
 
   if (!form.value.categoryId || isNaN(parseInt(form.value.categoryId))) {
-    error.value = 'Please select or create a valid category'
+    Swal.fire('Validation Error', 'Please select or create a valid category', 'warning')
     return
   }
   if (!form.value.venueId || isNaN(parseInt(form.value.venueId))) {
-    error.value = 'Please select or create a valid venue'
+    Swal.fire('Validation Error', 'Please select or create a valid venue', 'warning')
     return
   }
-
-  const selectedCategory = categories.value.find(c => c.id === form.value.categoryId)
-  const selectedVenue = venues.value.find(v => v.id === form.value.venueId)
-
-  if (!selectedCategory || !selectedVenue) {
-    error.value = 'Selected category or venue is invalid'
+  if (form.value.ticketPrice < 0 || isNaN(form.value.ticketPrice)) {
+    Swal.fire('Validation Error', 'Ticket price must be a non-negative number', 'warning')
     return
   }
 
@@ -291,24 +355,38 @@ async function handleSubmit() {
     userId: form.value.userId,
     startDate: new Date(form.value.startDate).toISOString(),
     endDate: new Date(form.value.endDate).toISOString(),
+    ticketPrice: form.value.ticketPrice,
     imageUrl: form.value.imageUrl,
     eventType: form.value.eventType,
-    categoryId: form.value.categoryId,
-    venueId: form.value.venueId,
+    category: form.value.categoryId,
+    venue: form.value.venueId,
   }
 
   try {
     if (isEdit) {
-      await EventService.updateEvent(eventId, payload) // <--- fixed method name
-      alert('Event updated successfully')
+      await EventService.update(eventId, payload)
+      Swal.fire('Success', 'Event updated successfully', 'success')
     } else {
-      await EventService.createEvent(payload)
-      alert('Event created successfully')
+      await EventService.create(payload)
+      Swal.fire('Success', 'Event created successfully', 'success')
+      // Reset form after creation
+      Object.assign(form.value, {
+        name: '',
+        description: '',
+        startDate: '',
+        endDate: '',
+        ticketPrice: 0,
+        imageUrl: '',
+        eventType: 'CONFERENCE',
+        categoryId: '',
+        venueId: '',
+      })
+      setDefaultDates()
     }
-    router.push({ name: 'EventList' }) // or wherever you want to go
+    router.push('/events')
   } catch (e) {
-    console.error('Failed to submit event', e)
-    error.value = 'Failed to submit event. Please try again.'
+    console.error('Failed to save event', e)
+    error.value = 'Failed to save event. Please try again.'
   } finally {
     isSubmitting.value = false
   }
@@ -316,5 +394,5 @@ async function handleSubmit() {
 </script>
 
 <style scoped>
-/* Add any scoped CSS you need here */
+/* Optional extra styling */
 </style>

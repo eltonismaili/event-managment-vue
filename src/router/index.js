@@ -3,14 +3,13 @@ import { useAuthStore } from '@/stores/authStore.js'
 
 import AuthView from '@/views/auth/AuthView.vue'
 import Register from '@/views/auth/Register.vue'
-import HomeView from '@/components/ui/HomeView.vue'
 import TheLayout from "@/components/ui/TheLayout.vue";
 import eventRouter from './eventRouter.js'
 import homeRouter from "@/router/homeRouter.js";
 import categoryRouter from "@/router/categoryRouter.js";
 import venueRouter from "@/router/venueRouter.js";
 import ticketRouter from "@/router/ticketRouter.js";
-import registrationRouter from "@/router/registrationRouter.js"; // Importing event routes
+import registrationRouter from "@/router/registrationRouter.js";
 
 const routes = [
     {
@@ -27,7 +26,7 @@ const routes = [
     },
     {
         path: '/',
-        component: TheLayout,  // <-- Use TheLayout here!
+        component: TheLayout,
         meta: { requiresAuth: true },
         children: [
             ...homeRouter,
@@ -36,7 +35,7 @@ const routes = [
             ...venueRouter,
             ...ticketRouter,
             ...registrationRouter
-            // other authenticated routes go here
+
         ]
     }
 ]

@@ -36,16 +36,29 @@ const fetchCategory = async () => {
   }
 }
 
+import Swal from 'sweetalert2'
+
 const updateCategory = async () => {
   try {
     await CategoryService.update(category.id, category)
-    alert('Category updated successfully!')
-    router.push('/categories')
+    await Swal.fire({
+      icon: 'success',
+      title: 'Updated!',
+      text: 'Category updated successfully!',
+      timer: 2000,
+      showConfirmButton: false,
+    })
+    await router.push('/categories')
   } catch (error) {
-    alert('Failed to update category.')
+    await Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'Failed to update category.',
+    })
     console.error(error)
   }
 }
+
 
 onMounted(fetchCategory)
 </script>

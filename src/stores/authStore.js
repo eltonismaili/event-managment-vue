@@ -1,46 +1,53 @@
 import { defineStore } from "pinia";
-import { computed, ref } from "vue";
+import { ref, computed } from "vue";
 import client from "@/helpers/client.js";
 import { jwtDecode } from "jwt-decode";
 
-export const useAuthStore = defineStore('auth', () => {
-    const token = ref(localStorage.getItem('token') || null);
+export const useAuthStore = defineStore("auth", () => {
+    const token = ref(localStorage.getItem("token") || null);
+    const user = ref(null);
+
+    // Function to decode token and load user info
+    const loadUserFromToken = () => {
+        if (token.value) {
+            user.value = jwtDecode(token.value);
+        }
+    };
+
+    // Call it once when store initializes
+    loadUserFromToken();
 
     // 🔐 LOGIN
-    const logIn = async (user) => {
-        const response = await client.post('auth/login', user);
+    const logIn = async (userData) => {
+        const response = await client.post("auth/login", userData);
 
         if (response.data) {
             token.value = response.data.token;
-            localStorage.setItem('token', token.value);
+            localStorage.setItem("token", token.value);
+            user.value = jwtDecode(token.value);
         }
     };
 
     // 🔓 LOGOUT
     const logOut = () => {
         token.value = null;
-        localStorage.removeItem('token');
+        user.value = null;
+        localStorage.removeItem("token");
     };
 
-    // 🆕 SIGNUP (REGISTER)
+    // 🆕 SIGNUP
     const signUp = async (userData) => {
-        const response = await client.post('users/register', userData);
+        const response = await client.post("users/register", userData);
         return response.data;
     };
 
-    // ✅ isLoggedIn
     const isLoggedIn = computed(() => !!token.value);
-
-    // 👤 Decode JWT to get user info
-    const loggedInUser = computed(() => {
-        return token.value ? jwtDecode(token.value) : null;
-    });
 
     return {
         logIn,
         logOut,
         signUp,
         isLoggedIn,
-        loggedInUser
+        loggedInUser: user, // reactive ref
     };
 });

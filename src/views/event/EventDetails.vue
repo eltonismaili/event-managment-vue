@@ -42,15 +42,19 @@
         <strong>Venue:</strong> <span class="text-primary">{{ venueName }}</span>
       </p>
 
-      <!-- Buy Tickets Button -->
-      <button
-          class="btn btn-success"
-          @click="toggleForm"
-      >
+      <p class="text-muted small mb-3">
+        <strong>Capacity:</strong> <span class="text-primary">{{ venueCapacity }}</span>
+      </p>
+
+      <p class="text-muted small mb-3">
+        <strong>Price:</strong>
+        <span class="text-primary">${{ event.ticketPrice?.toFixed(2) ?? '0.00' }}</span>
+      </p>
+
+      <button class="btn btn-success" @click="toggleForm">
         {{ showForm ? 'Cancel' : 'Buy Tickets' }}
       </button>
 
-      <!-- Buy Tickets Form -->
       <form v-if="showForm" @submit.prevent="submitTicket" class="mt-4">
         <div class="mb-3">
           <label for="ticketName" class="form-label">Name on Ticket</label>
@@ -70,19 +74,6 @@
               id="quantity"
               v-model.number="ticketData.quantity"
               min="1"
-              class="form-control"
-              required
-          />
-        </div>
-
-        <div class="mb-3">
-          <label for="price" class="form-label">Price per Ticket ($)</label>
-          <input
-              type="number"
-              id="price"
-              v-model.number="ticketData.price"
-              min="0"
-              step="0.01"
               class="form-control"
               required
           />
@@ -125,15 +116,16 @@ import EventService from '@/services/eventService'
 import VenueService from '@/services/venueService'
 import CategoryService from "@/services/categoryService.js"
 import TicketService from '@/services/ticketService.js'
+import Swal from 'sweetalert2'
+import { useAuthStore } from "@/stores/authStore.js"
 
-// Simulate logged-in user ID, replace with your auth logic
-const currentUserId = ref(1)
-
+const authStore = useAuthStore()
 const route = useRoute()
 const router = useRouter()
 
 const event = ref(null)
 const venueName = ref('Unknown Venue')
+const venueCapacity = ref('Unknown')  // <-- Added here
 const allCategories = ref([])
 const categoryName = ref('')
 
@@ -141,7 +133,6 @@ const showForm = ref(false)
 const ticketData = ref({
   name: '',
   quantity: 1,
-  price: 0,
   startDate: '',
   endDate: ''
 })
@@ -160,20 +151,25 @@ const toDateTimeLocal = (dateString) => {
 const fetchEvent = async () => {
   try {
     const eventId = route.params.id
-    event.value = await EventService.getEventById(eventId)
+    let evt = await EventService.getEventById(eventId)
+
+    evt.price = Number(evt.price) || 0
+    event.value = evt
+
+    console.log('Fetched event:', event.value)  // debug log
 
     if (event.value) {
       if (event.value.venueId) {
         const venues = await VenueService.getAll()
         const venue = venues.find((v) => v.id === event.value.venueId)
         venueName.value = venue ? venue.name : 'Unknown Venue'
+        venueCapacity.value = venue ? venue.capacity || 'N/A' : 'N/A'  // <-- Added here
       }
       if (event.value.categoryId) {
         const cat = allCategories.value.find(c => c.id === event.value.categoryId)
         categoryName.value = cat ? cat.name : 'N/A'
       }
 
-      // Prefill ticket date fields with event dates
       ticketData.value.startDate = toDateTimeLocal(event.value.startDate)
       ticketData.value.endDate = toDateTimeLocal(event.value.endDate)
     }
@@ -197,28 +193,42 @@ const toggleForm = () => {
 const submitTicket = async () => {
   try {
     if (!event.value) {
-      alert('Event not loaded yet.')
+      await Swal.fire({
+        icon: 'warning',
+        title: 'Event not loaded yet',
+        text: 'Please wait for event details to load before purchasing a ticket.',
+      })
       return
     }
 
-    // Prepare payload with plain IDs (not nested objects)
     const payload = {
       name: ticketData.value.name,
       quantity: ticketData.value.quantity,
-      price: ticketData.value.price,
+      ticketPrice: Number(event.value.price) || 0,
       startDate: new Date(ticketData.value.startDate).toISOString(),
       endDate: new Date(ticketData.value.endDate).toISOString(),
-      eventId: event.value.id,      // just ID, not object
-      userId: currentUserId.value   // just ID, not object
+      eventId: event.value.id,
+      userId: authStore.loggedInUser?.id,
     }
 
     await TicketService.create(payload)
 
-    alert('Ticket purchase successful!')
+    await Swal.fire({
+      icon: 'success',
+      title: 'Ticket Purchased!',
+      html: `Successfully bought a ticket.<br><a href="http://localhost:5173/tickets" target="_blank" style="color:#3085d6;text-decoration:underline;">Go get ticket</a>`,
+      confirmButtonText: 'Close',
+      timer: 7000,
+    })
+
     showForm.value = false
   } catch (error) {
     console.error('Failed to purchase ticket:', error)
-    alert('Failed to purchase ticket. Please try again.')
+    await Swal.fire({
+      icon: 'error',
+      title: 'Purchase Failed',
+      text: 'Failed to purchase ticket. Please try again.',
+    })
   }
 }
 
@@ -262,19 +272,10 @@ img:hover {
   font-size: 1.1rem;
   border-radius: 0.375rem;
   transition: background-color 0.3s ease, color 0.3s ease;
-  cursor: pointer;
+  margin-top: 1rem;
 }
-
 .btn-success:hover {
   background-color: #218838;
   color: white;
-}
-
-p {
-  line-height: 1.5;
-}
-
-form {
-  max-width: 400px;
 }
 </style>

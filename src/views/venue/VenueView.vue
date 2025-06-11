@@ -1,60 +1,63 @@
 <template>
-  <div class="container mt-4">
-    <h2>Venues</h2>
-
-    <ul class="list-group">
-      <li
-          v-for="venue in venues"
-          :key="venue.id"
-          class="list-group-item d-flex justify-content-between align-items-center"
-      >
-        <span @click="$router.push(`/venues/details/${venue.id}`)" style="cursor:pointer;">
-          {{ venue.name }}
-        </span>
-        <div>
-          <button
-              @click="$router.push(`/venues/details/${venue.id}`)"
-              class="btn btn-sm btn-info me-2"
-          >
-            View
-          </button>
-          <button
-              @click="$router.push(`/venues/update/${venue.id}`)"
-              class="btn btn-sm btn-warning me-2"
-          >
-            Edit
-          </button>
-          <button @click="deleteVenue(venue.id)" class="btn btn-sm btn-danger">
-            Delete
-          </button>
-        </div>
-      </li>
-    </ul>
-  </div>
+  <ItemList
+      title="Venues"
+      :items="venues"
+      :enableView="true"
+      :enableEdit="true"
+      :enableDelete="true"
+      @click="goToDetails"
+      @view="goToDetails"
+      @edit="editVenue"
+      @delete="deleteVenue"
+  />
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import VenueService from '@/services/venueService'
+import ItemList from "@/components/app/ItemList.vue";
 
+const router = useRouter()
 const venues = ref([])
 
 const fetchVenues = async () => {
   venues.value = await VenueService.getAll()
 }
 
-const deleteVenue = async (id) => {
-  if (confirm('Are you sure you want to delete this venue?')) {
+const goToDetails = (venue) => {
+  router.push(`/venues/details/${venue.id}`)
+}
+
+const editVenue = (venue) => {
+  router.push(`/venues/update/${venue.id}`)
+}
+
+import Swal from 'sweetalert2'
+
+const deleteVenue = async (venue) => {
+  const result = await Swal.fire({
+    title: 'Are you sure?',
+    text: "This venue will be deleted permanently!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Yes, delete it!',
+  })
+
+  if (result.isConfirmed) {
     try {
-      await VenueService.delete(id)
-      venues.value = venues.value.filter(v => v.id !== id)
-      alert('Venue deleted successfully.')
+      await VenueService.delete(venue.id)
+      venues.value = venues.value.filter(v => v.id !== venue.id)
+      await Swal.fire('Deleted!', 'Venue deleted successfully.', 'success')
     } catch (error) {
-      alert('Failed to delete venue.')
       console.error(error)
+      await Swal.fire('Error', 'Failed to delete venue.', 'error')
     }
   }
 }
+
 
 onMounted(fetchVenues)
 </script>

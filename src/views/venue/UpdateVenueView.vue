@@ -41,6 +41,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import VenueService from '@/services/venueService'
 import AddressService from '@/services/addressService'
+import Swal from 'sweetalert2'
 
 const route = useRoute()
 const router = useRouter()
@@ -93,14 +94,27 @@ const handleSubmit = async () => {
     const updatedVenue = await VenueService.update(id, venuePayload)
 
     if (updatedVenue) {
+      await Swal.fire({
+        icon: 'success',
+        title: 'Updated!',
+        text: 'Venue updated successfully.',
+        timer: 2000,
+        showConfirmButton: false
+      })
       await router.push('/venues')
     } else {
       console.error("Venue update failed: no data returned")
     }
   } catch (err) {
     console.error('Failed to update venue:', err)
+    await Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'Failed to update venue.',
+    })
   }
 }
 
 onMounted(fetchVenue)
 </script>
+
