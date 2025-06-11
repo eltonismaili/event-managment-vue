@@ -11,7 +11,7 @@
       >
         <div class="card event-card h-100 shadow-sm">
           <img
-              :src="event.imageUrl || `https://source.unsplash.com/400x250/?concert,festival&sig=${event.id}`"
+              :src="getFullImageUrl(event.imagePath) || `https://source.unsplash.com/400x250/?concert,festival&sig=${event.id}`"
               class="card-img-top"
               alt="Event Image"
           />
@@ -62,6 +62,13 @@ const fetchData = async () => {
   }
 }
 
+// Prepends backend base URL if imagePath exists
+const getFullImageUrl = (path) => {
+  if (!path || typeof path !== "string") return null
+  const baseUrl = "http://localhost:8080/"
+  return baseUrl + path
+}
+
 const getVenueName = (venueId) => {
   const venue = venues.value.find(v => v.id === venueId)
   return venue ? venue.name : 'Unknown Venue'
@@ -73,8 +80,6 @@ const formatDate = (date) => {
 
 const goToEventDetails = (eventId) => {
   router.push({ name: 'event-details', params: { id: eventId } })
-  // ose nëse route nuk ka emër:
-  // router.push(`/events/${eventId}`)
 }
 
 onMounted(fetchData)

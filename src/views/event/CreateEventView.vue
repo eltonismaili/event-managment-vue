@@ -27,25 +27,16 @@
         <input id="endDate" v-model="form.endDate" type="datetime-local" class="form-control" required />
       </div>
 
-      <!-- Image URL -->
+      <!-- Image Upload -->
       <div class="mb-3">
-        <label for="imageUrl" class="form-label">Image URL (Optional)</label>
-        <input id="imageUrl" v-model="form.imageUrl" type="url" class="form-control" placeholder="https://example.com/image.jpg" />
+        <label for="imageFile" class="form-label">Event Image</label>
+        <input id="imageFile" type="file" class="form-control" @change="handleFileUpload" accept="image/*" />
       </div>
 
       <!-- Ticket Price -->
       <div class="mb-3">
         <label for="ticketPrice" class="form-label">Ticket Price (€)</label>
-        <input
-            id="ticketPrice"
-            v-model.number="form.ticketPrice"
-            type="number"
-            class="form-control"
-            placeholder="e.g., 20"
-            required
-            min="0"
-            step="0.01"
-        />
+        <input id="ticketPrice" v-model.number="form.ticketPrice" type="number" class="form-control" placeholder="e.g., 20" required min="0" step="0.01" />
       </div>
 
       <!-- Event Type -->
@@ -92,15 +83,7 @@
         <input id="newVenueName" v-model="newVenue.name" type="text" class="form-control" placeholder="Venue name" />
 
         <label for="venueCapacity" class="form-label mt-3">Venue Capacity</label>
-        <input
-            id="venueCapacity"
-            v-model.number="newVenue.capacity"
-            type="number"
-            class="form-control"
-            placeholder="Enter capacity"
-            min="1"
-            required
-        />
+        <input id="venueCapacity" v-model.number="newVenue.capacity" type="number" class="form-control" placeholder="Enter capacity" min="1" required />
 
         <label class="form-label mt-3">Address</label>
         <input v-model="newVenue.address.street" type="text" class="form-control mb-2" placeholder="Street" />
@@ -140,7 +123,6 @@ const form = ref({
   userId: store.loggedInUser.id,
   startDate: '',
   endDate: '',
-  imageUrl: '',
   eventType: 'CONFERENCE',
   categoryId: '',
   venueId: '',
@@ -148,6 +130,12 @@ const form = ref({
   createdBy: 'admin',
   createdAt: new Date().toISOString()
 })
+
+const imageFile = ref(null)
+
+function handleFileUpload(e) {
+  imageFile.value = e.target.files[0]
+}
 
 const isSubmitting = ref(false)
 const error = ref(null)
@@ -159,7 +147,7 @@ const creatingNewVenue = ref(false)
 
 const newVenue = ref({
   name: '',
-  capacity: null, // ✅ Added capacity
+  capacity: null,
   address: {
     street: '',
     city: '',
@@ -279,24 +267,23 @@ async function handleSubmit() {
     return
   }
 
-  const payload = {
-    name: form.value.name.trim(),
-    description: form.value.description.trim(),
-    startDate: form.value.startDate,
-    endDate: form.value.endDate,
-    imageUrl: form.value.imageUrl?.trim() || null,
-    eventType: form.value.eventType,
-    categoryId: form.value.categoryId,
-    venueId: form.value.venueId,
-    ticketPrice: form.value.ticketPrice,
-    user: { id: store.loggedInUser.id },
-    createdBy: form.value.createdBy,
-    createdAt: form.value.createdAt
+  const formData = new FormData()
+
+  // Append the event data as a JSON blob under "data"
+  const eventPayload = { ...form.value }
+  const eventBlob = new Blob([JSON.stringify(eventPayload)], {
+    type: 'application/json',
+  })
+  formData.append('data', eventBlob)
+
+  // Append image file as "image"
+  if (imageFile.value) {
+    formData.append('image', imageFile.value)
   }
 
   isSubmitting.value = true
   try {
-    await EventService.createEvent(payload)
+    await EventService.createEvent(formData)
     await Swal.fire({
       icon: 'success',
       title: 'Event Created!',

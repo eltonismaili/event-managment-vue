@@ -33,10 +33,26 @@
         <input v-model.number="form.ticketPrice" type="number" min="0" step="0.01" id="ticketPrice" class="form-control" required />
       </div>
 
-      <!-- Image URL -->
+      <!-- Image URL with Preview (updated) -->
       <div class="mb-3">
         <label for="imageUrl" class="form-label">Image URL</label>
-        <input v-model="form.imageUrl" type="url" id="imageUrl" class="form-control" />
+        <input
+            v-model="form.imageUrl"
+            type="url"
+            id="imageUrl"
+            class="form-control mb-2"
+            placeholder="Enter image URL"
+        />
+        <div v-if="form.imageUrl" class="mt-2">
+          <label class="form-label">Preview:</label>
+          <img
+              :src="form.imageUrl"
+              alt="Event Image"
+              class="img-fluid rounded border"
+              style="max-height: 250px; object-fit: cover;"
+              @error="form.imageUrl = ''"
+          />
+        </div>
       </div>
 
       <!-- Event Type -->
@@ -386,7 +402,7 @@ async function handleSubmit() {
     router.push('/events')
   } catch (e) {
     console.error('Failed to save event', e)
-    error.value = 'Failed to save event. Please try again.'
+    error.value = 'Failed to save event. Please try again later.'
   } finally {
     isSubmitting.value = false
   }
@@ -394,5 +410,5 @@ async function handleSubmit() {
 </script>
 
 <style scoped>
-/* Optional extra styling */
+/* Add any component-specific styles here */
 </style>
