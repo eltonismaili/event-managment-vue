@@ -38,6 +38,11 @@ class TicketService {
         const response = await client.delete(`tickets/${id}`)
         return response.status === 204
     }
+
+    async getTicketByUserId(userId) {
+        const response = await client.get(`tickets/user/${userId}`)
+        return response.status === 200 ? response.data : []
+    }
 }
 
 export default new TicketService()

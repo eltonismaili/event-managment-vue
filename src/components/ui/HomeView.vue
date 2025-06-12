@@ -9,35 +9,7 @@
           v-for="event in events"
           :key="event.id"
       >
-        <div class="card event-card h-100 shadow-sm">
-          <img
-              :src="getFullImageUrl(event.imagePath) || `https://source.unsplash.com/400x250/?concert,festival&sig=${event.id}`"
-              class="card-img-top"
-              alt="Event Image"
-          />
-          <div class="card-body">
-            <h5 class="card-title fw-bold text-primary">{{ event.name }}</h5>
-            <p class="mb-1">
-              <i class="bi bi-tags-fill text-secondary me-1"></i>
-              <span class="badge bg-info text-dark">{{ event.eventType }}</span>
-            </p>
-            <p class="mb-1">
-              <i class="bi bi-calendar-event me-2 text-secondary"></i>
-              <strong>Start:</strong> {{ formatDate(event.startDate) }}
-            </p>
-            <p class="mb-3">
-              <i class="bi bi-calendar-check me-2 text-secondary"></i>
-              <strong>End:</strong> {{ formatDate(event.endDate) }}
-            </p>
-            <p class="mb-3">
-              <i class="bi bi-geo-alt-fill me-2 text-secondary"></i>
-              {{ getVenueName(event.venueId) }}
-            </p>
-            <button class="btn btn-outline-primary w-100" @click="goToEventDetails(event.id)">
-              View Details
-            </button>
-          </div>
-        </div>
+        <EventCard :event="event" :venueName="getVenueName(event.venueId)" />
       </div>
     </div>
   </div>
@@ -45,13 +17,12 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import EventCard from "@/components/app/EventCard.vue"
 import EventService from '@/services/eventService'
 import VenueService from '@/services/venueService'
 
 const events = ref([])
 const venues = ref([])
-const router = useRouter()
 
 const fetchData = async () => {
   try {
@@ -62,43 +33,10 @@ const fetchData = async () => {
   }
 }
 
-// Prepends backend base URL if imagePath exists
-const getFullImageUrl = (path) => {
-  if (!path || typeof path !== "string") return null
-  const baseUrl = "http://localhost:8080/"
-  return baseUrl + path
-}
-
 const getVenueName = (venueId) => {
   const venue = venues.value.find(v => v.id === venueId)
   return venue ? venue.name : 'Unknown Venue'
 }
 
-const formatDate = (date) => {
-  return new Date(date).toLocaleDateString()
-}
-
-const goToEventDetails = (eventId) => {
-  router.push({ name: 'event-details', params: { id: eventId } })
-}
-
 onMounted(fetchData)
 </script>
-
-<style scoped>
-.event-card {
-  border-radius: 16px;
-  overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.event-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
-}
-
-.card-img-top {
-  height: 200px;
-  object-fit: cover;
-}
-</style>

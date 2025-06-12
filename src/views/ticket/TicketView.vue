@@ -47,13 +47,13 @@ import { ref, onMounted } from 'vue'
 import html2pdf from 'html2pdf.js'
 import TicketService from '@/services/ticketService'
 import EventService from '@/services/eventService'
+import { useAuthStore } from '@/stores/authStore.js'
 
-// Simulated current logged-in user ID and name (replace with real auth info)
-const currentUserId = 1
-const buyerName = 'Logged-in User' // replace with real user name if available
+const authStore = useAuthStore()
 
 const tickets = ref([])
 const events = ref([])
+const buyerName = authStore.loggedInUser?.name || 'Unknown Buyer'
 
 const formatDate = (date) => new Date(date).toLocaleString()
 
@@ -67,16 +67,19 @@ const fetchEvents = async () => {
 
 const fetchTickets = async () => {
   try {
-    const allTickets = await TicketService.getAll()
-    // Filter tickets by current user
-    const userTickets = allTickets.filter(t => t.userId === currentUserId)
-    // Map eventId to eventName and price from event
-    tickets.value = userTickets.map(ticket => {
+    const userId = authStore.loggedInUser?.id
+    if (!userId) {
+      console.warn('User not logged in or ID not available')
+      return
+    }
+
+    const allTickets = await TicketService.getTicketByUserId(userId)
+
+    tickets.value = allTickets.map(ticket => {
       const event = events.value.find(e => e.id === ticket.eventId)
       return {
         ...ticket,
         eventName: event ? event.name : 'Unknown Event',
-        // Use event.ticketPrice or event.price (adjust according to your event object)
         price: event ? (event.ticketPrice ?? event.price ?? 0) : 0
       }
     })
