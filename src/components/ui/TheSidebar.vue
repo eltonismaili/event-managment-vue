@@ -1,9 +1,29 @@
 <!-- src/components/Sidebar.vue -->
+<script setup>
+import { useRoute } from 'vue-router'
+import { useAuthStore } from '@/stores/authStore'
+
+const route = useRoute()
+const authStore = useAuthStore()
+
+const menuItems = [
+  { label: "Home", icon: "bi bi-house", route: "/", roles: ["USER", "ADMIN"] },
+  { label: "Events", icon: "bi bi-calendar-event", route: "/events", roles: ["ADMIN","USER"] },
+  { label: "Categories", icon: "bi bi-tags", route: "/categories", roles: ["ADMIN"] },
+  { label: "Venues", icon: "bi bi-geo-alt", route: "/venues", roles: ["ADMIN"] },
+  { label: "Tickets", icon: "bi bi-ticket-perforated", route: "/tickets", roles: ["USER", "ADMIN"] }
+]
+
+const userRole = authStore.loggedInUser?.role || 'GUEST'
+
+const visibleMenuItems = menuItems.filter(item => item.roles.includes(userRole))
+</script>
+
 <template>
   <div class="sidebar d-flex flex-column p-3 shadow-sm">
     <h4 class="text-dark fw-bold mb-4">📊 Dashboard</h4>
     <ul class="nav nav-pills flex-column gap-1">
-      <li v-for="item in menuItems" :key="item.label" class="nav-item">
+      <li v-for="item in visibleMenuItems" :key="item.label" class="nav-item">
         <router-link
             :to="item.route"
             class="nav-link d-flex align-items-center gap-2"
@@ -15,21 +35,6 @@
     </ul>
   </div>
 </template>
-
-<script setup>
-import { useRoute } from 'vue-router'
-
-const route = useRoute()
-
-const menuItems = [
-  { label: "Home", icon: "bi bi-house", route: "/" },
-  { label: "Events", icon: "bi bi-calendar-event", route: "/events" },
-  { label: "Categories", icon: "bi bi-tags", route: "/categories" },
-  { label: "Venues", icon: "bi bi-geo-alt", route: "/venues" },
-  { label: "Tickets", icon: "bi bi-ticket-perforated", route: "/tickets" },
-  { label: "Registrations", icon: "bi bi-file-check", route: "/registrations" }
-]
-</script>
 
 <style scoped>
 .sidebar {

@@ -1,22 +1,6 @@
-<template>
-  <div class="container mt-4" v-if="category">
-    <h2>Update Category</h2>
-    <form @submit.prevent="updateCategory">
-      <div class="mb-3">
-        <label for="name" class="form-label">Category Name</label>
-        <input id="name" v-model="category.name" type="text" class="form-control" required />
-      </div>
-
-      <button type="submit" class="btn btn-primary">Update Category</button>
-      <button type="button" class="btn btn-secondary ms-2" @click="$router.back()">Cancel</button>
-    </form>
-  </div>
-  <div v-else class="container mt-4">Loading category data...</div>
-</template>
-
 <script setup>
-import { reactive, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import {reactive, onMounted} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
 import CategoryService from '@/services/categoryService'
 
 const route = useRoute()
@@ -62,3 +46,18 @@ const updateCategory = async () => {
 
 onMounted(fetchCategory)
 </script>
+<template>
+  <div class="container mt-4" v-if="category">
+    <h2>Update Category</h2>
+    <form @submit.prevent="updateCategory">
+      <div class="mb-3">
+        <label for="name" class="form-label">Category Name</label>
+        <input id="name" v-model="category.name" type="text" class="form-control" required/>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Update Category</button>
+      <button type="button" class="btn btn-secondary ms-2" @click="$router.back()">Cancel</button>
+    </form>
+  </div>
+  <div v-else class="container mt-4">Loading category data...</div>
+</template>

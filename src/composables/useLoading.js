@@ -1,7 +1,6 @@
 import {ref} from "vue";
 
 export function useLoading() {
-    // inject variabla reaktive
 
     const isLoading = ref(false)
 

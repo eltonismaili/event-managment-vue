@@ -9,7 +9,6 @@ import homeRouter from "@/router/homeRouter.js";
 import categoryRouter from "@/router/categoryRouter.js";
 import venueRouter from "@/router/venueRouter.js";
 import ticketRouter from "@/router/ticketRouter.js";
-import registrationRouter from "@/router/registrationRouter.js";
 
 const routes = [
     {
@@ -34,8 +33,6 @@ const routes = [
             ...categoryRouter,
             ...venueRouter,
             ...ticketRouter,
-            ...registrationRouter
-
         ]
     }
 ]
@@ -45,17 +42,23 @@ const router = createRouter({
     routes
 })
 
-// Navigation guard remains the same
 router.beforeEach((to, from, next) => {
     const authStore = useAuthStore()
+    const userRole = authStore.loggedInUser?.role
+
 
     if (to.meta.requiresAuth && !authStore.isLoggedIn) {
         return next({ name: 'login' })
     }
 
+
     if (!to.meta.requiresAuth && authStore.isLoggedIn && (to.name === 'login' || to.name === 'register')) {
         return next({ name: 'home' })
     }
+
+    // if (to.meta.roles && !to.meta.roles.includes(userRole)) {
+    //     return next({ name: 'home' }) // redirect unauthorized users to home
+    // }
 
     next()
 })

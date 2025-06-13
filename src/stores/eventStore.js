@@ -1,13 +1,13 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import EventService from '@/services/eventService'  // your API client for events
+import EventService from '@/services/eventService'
 
 export const useEventStore = defineStore('event', () => {
     const events = ref([])
     const loading = ref(false)
     const error = ref(null)
 
-    // Load all events from backend
+
     async function fetchEvents() {
         loading.value = true
         error.value = null
@@ -22,7 +22,7 @@ export const useEventStore = defineStore('event', () => {
         }
     }
 
-    // Create event
+
     async function createEvent(eventData) {
         loading.value = true
         error.value = null
@@ -39,7 +39,7 @@ export const useEventStore = defineStore('event', () => {
         }
     }
 
-    // Update event
+
     async function updateEvent(id, eventData) {
         loading.value = true
         error.value = null
@@ -59,7 +59,7 @@ export const useEventStore = defineStore('event', () => {
         }
     }
 
-    // Delete event
+
     async function deleteEvent(id) {
         loading.value = true
         error.value = null
@@ -78,7 +78,7 @@ export const useEventStore = defineStore('event', () => {
         }
     }
 
-    // Computed getter for events count
+
     const eventsCount = computed(() => events.value.length)
 
     return {

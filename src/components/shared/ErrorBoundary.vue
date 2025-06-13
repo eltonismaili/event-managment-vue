@@ -1,39 +1,67 @@
 <script setup>
-import {onErrorCaptured} from "vue";
-import {useAppToast} from "@/composables/useAppToast.js";
-import {useAuthStore} from "@/stores/authStore.js";
-import {useRouter} from "vue-router";
+import { onErrorCaptured } from 'vue'
+import { useAppToast } from '@/composables/useAppToast.js'
+import { useAuthStore } from '@/stores/authStore.js'
+import { useRouter } from 'vue-router'
 
-const {showError} = useAppToast()
+const { showError } = useAppToast()
 const store = useAuthStore()
 const router = useRouter()
 
 onErrorCaptured((err) => {
-  console.error('Error captured in ErrorBoundary:', err);
-  // Handle the error, e.g., log it or show a notification
+  console.error('Error captured in ErrorBoundary:', err)
 
-  // Check if the error is related to authentication
-  if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+  const response = err?.response
+  const status = response?.status
+  const message = response?.data?.message || err.message || 'An unexpected error occurred'
+
+  if (status === 401 || status === 403) {
     store.logOut()
-    showError(err.response?.data?.message || 'Session expired, please log in again')
-    // Redirect to login page after a short delay
-    setTimeout(() => {
-      router.push({name: 'login'})
-    }, 100)
-
+    showError('Session expired or unauthorized. Please log in again.')
+    setTimeout(() => router.push({ name: 'login' }), 100)
     return
   }
 
-  showError(err.response?.data?.message || 'An error occurred')
 
-  return false; // Returning false allows the error to propagate further
-});
+  if (status === 400) {
+    showError(`Validation error: ${message}`)
+    return
+  }
+
+
+  if (status === 404) {
+    showError('The requested resource was not found.')
+    return
+  }
+
+
+  if (status === 500) {
+    showError('A server error occurred. Please try again later.')
+    return
+  }
+
+
+  if (!response && err.message?.includes('Network Error')) {
+    showError('Network error. Please check your internet connection.')
+    return
+  }
+
+
+  if (err.code === 'ECONNABORTED') {
+    showError('Request timed out. Please try again.')
+    return
+  }
+
+
+  showError(`An error occurred: ${message}`)
+
+  return false
+})
 </script>
 
 <template>
-  <slot/>
+  <slot />
 </template>
 
 <style scoped>
-
 </style>

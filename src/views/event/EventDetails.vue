@@ -77,11 +77,11 @@ const fetchEvent = async () => {
       categoryName.value = cat?.name || 'N/A'
     }
 
-    // Initialize form dates
+
     ticketData.value.startDate = toDateTimeLocal(event.value.startDate)
     ticketData.value.endDate = toDateTimeLocal(event.value.endDate)
 
-    // Fetch sold tickets for this event
+
     const allTickets = await TicketService.getAll()
     const ticketsForThisEvent = allTickets.filter(t => t.eventId === event.value.id)
     ticketsSold.value = ticketsForThisEvent.reduce((sum, t) => sum + t.quantity, 0)
@@ -128,7 +128,7 @@ const submitTicket = async () => {
     })
 
     showForm.value = false
-    await fetchEvent() // refresh available tickets
+    await fetchEvent()
   } catch (error) {
     console.error('Purchase failed:', error)
     await Swal.fire({
@@ -204,7 +204,7 @@ onMounted(async () => {
         <strong>Price:</strong> <span class="text-primary">${{ event.ticketPrice?.toFixed(2) ?? '0.00' }}</span>
       </p>
 
-      <!-- Ticket purchase button -->
+
       <button
           class="btn btn-success"
           @click="toggleForm"
@@ -214,7 +214,7 @@ onMounted(async () => {
         {{ showForm ? 'Cancel' : 'Buy Tickets' }}
       </button>
 
-      <!-- Ticket purchase form -->
+
       <form v-if="showForm" @submit.prevent="submitTicket" class="mt-4">
         <div class="mb-3">
           <label for="ticketName" class="form-label">Name on Ticket</label>

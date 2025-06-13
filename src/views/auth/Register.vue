@@ -66,7 +66,6 @@ async function handleSubmit() {
     return
   }
 
-  // Set createdAt as ISO string of current date/time
   form.createdAt = new Date().toISOString()
 
   const payload = {
@@ -105,7 +104,7 @@ async function handleSubmit() {
 
       <form @submit.prevent="handleSubmit" novalidate>
         <div class="form-grid">
-          <!-- Name -->
+
           <div>
             <label for="name">Name *</label>
             <input
@@ -136,7 +135,7 @@ async function handleSubmit() {
             <div class="invalid-feedback">Surname is required (2-50 chars).</div>
           </div>
 
-          <!-- Email -->
+
           <div>
             <label for="email">Email *</label>
             <input
@@ -152,7 +151,7 @@ async function handleSubmit() {
             <div class="invalid-feedback">Valid email is required.</div>
           </div>
 
-          <!-- Password -->
+
           <div>
             <label for="password">Password *</label>
             <input
@@ -168,7 +167,7 @@ async function handleSubmit() {
             <div class="invalid-feedback">Password is required (2-50 chars).</div>
           </div>
 
-          <!-- Age -->
+
           <div>
             <label for="age">Age *</label>
             <input

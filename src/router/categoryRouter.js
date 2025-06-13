@@ -1,9 +1,7 @@
-// categoryRouter.js
+
 import CategoryView from "@/views/category/CategoryView.vue";
 import UpdateCategoryView from "@/views/category/UpdateCategoryView.vue";
-// import CreateCategoryView from "@/views/category/CreateCategoryView.vue";
-// import UpdateCategoryView from "@/views/category/UpdateCategoryView.vue";
-// import CategoryDetails from "@/views/category/CategoryDetails.vue";
+
 
 export default [
     {

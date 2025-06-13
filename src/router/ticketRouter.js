@@ -1,4 +1,4 @@
-// ticketRouter.js
+
 import TicketView from '@/views/ticket/TicketView.vue'
 
 

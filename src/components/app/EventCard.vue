@@ -1,3 +1,27 @@
+<script setup>
+import {computed} from 'vue'
+import {useRouter} from 'vue-router'
+
+const props = defineProps({
+  event: Object,
+  venueName: String,
+})
+
+const router = useRouter()
+
+const imageUrl = computed(() => {
+  const baseUrl = 'http://localhost:8080/'
+  return props.event.imagePath
+      ? baseUrl + props.event.imagePath
+      : `https://source.unsplash.com/400x250/?concert,festival&sig=${props.event.id}`
+})
+
+const formatDate = (date) => new Date(date).toLocaleDateString()
+
+const goToEventDetails = () => {
+  router.push({name: 'event-details', params: {id: props.event.id}})
+}
+</script>
 <template>
   <div class="card event-card h-100 shadow-sm">
     <img
@@ -29,31 +53,6 @@
     </div>
   </div>
 </template>
-
-<script setup>
-import { computed } from 'vue'
-import { useRouter } from 'vue-router'
-
-const props = defineProps({
-  event: Object,
-  venueName: String,
-})
-
-const router = useRouter()
-
-const imageUrl = computed(() => {
-  const baseUrl = 'http://localhost:8080/'
-  return props.event.imagePath
-      ? baseUrl + props.event.imagePath
-      : `https://source.unsplash.com/400x250/?concert,festival&sig=${props.event.id}`
-})
-
-const formatDate = (date) => new Date(date).toLocaleDateString()
-
-const goToEventDetails = () => {
-  router.push({ name: 'event-details', params: { id: props.event.id } })
-}
-</script>
 
 <style scoped>
 .event-card {

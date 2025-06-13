@@ -1,3 +1,41 @@
+<script setup>
+import { computed } from 'vue'
+import { useAuthStore } from '@/stores/authStore'
+
+const authStore = useAuthStore()
+
+const props = defineProps({
+  title: String,
+  items: {
+    type: Array,
+    required: true,
+  },
+  enableView: {
+    type: Boolean,
+    default: false,
+  },
+  enableEdit: {
+    type: Boolean,
+    default: false,
+  },
+  enableDelete: {
+    type: Boolean,
+    default: false,
+  },
+})
+
+defineEmits(['click', 'edit', 'delete', 'view'])
+
+// Computed checks
+const canEdit = computed(() => {
+  return props.enableEdit && authStore.loggedInUser?.role !== 'USER'
+})
+
+const canDelete = computed(() => {
+  return props.enableDelete && authStore.loggedInUser?.role !== 'USER'
+})
+</script>
+
 <template>
   <div class="container mt-4">
     <h2>{{ title }}</h2>
@@ -21,7 +59,7 @@
           </button>
 
           <button
-              v-if="enableEdit"
+              v-if="canEdit"
               @click="$emit('edit', item)"
               class="btn btn-sm btn-warning me-2"
           >
@@ -29,7 +67,7 @@
           </button>
 
           <button
-              v-if="enableDelete"
+              v-if="canDelete"
               @click="$emit('delete', item)"
               class="btn btn-sm btn-danger"
           >
@@ -40,26 +78,3 @@
     </ul>
   </div>
 </template>
-
-<script setup>
-defineProps({
-  title: String,
-  items: {
-    type: Array,
-    required: true,
-  },
-  enableView: {
-    type: Boolean,
-    default: false,
-  },
-  enableEdit: {
-    type: Boolean,
-    default: false,
-  },
-  enableDelete: {
-    type: Boolean,
-    default: false,
-  },
-})
-defineEmits(['click', 'edit', 'delete', 'view'])
-</script>

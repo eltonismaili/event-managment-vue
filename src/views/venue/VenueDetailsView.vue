@@ -1,3 +1,25 @@
+<script setup>
+import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+import VenueService from '@/services/venueService'
+
+const route = useRoute()
+const venue = ref(null)
+
+const fetchVenueDetails = async () => {
+  try {
+    const id = route.params.id
+    const data = await VenueService.getById(id)
+    if (data) {
+      venue.value = data
+    }
+  } catch (error) {
+    console.error('Failed to load venue details:', error)
+  }
+}
+
+onMounted(fetchVenueDetails)
+</script>
 <template>
   <div class="container mt-5">
     <button class="btn btn-outline-primary mb-4" @click="$router.back()">
@@ -38,28 +60,7 @@
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
-import VenueService from '@/services/venueService'
 
-const route = useRoute()
-const venue = ref(null)
-
-const fetchVenueDetails = async () => {
-  try {
-    const id = route.params.id
-    const data = await VenueService.getById(id)
-    if (data) {
-      venue.value = data
-    }
-  } catch (error) {
-    console.error('Failed to load venue details:', error)
-  }
-}
-
-onMounted(fetchVenueDetails)
-</script>
 
 <style scoped>
 .card {

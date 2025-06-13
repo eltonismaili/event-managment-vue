@@ -9,24 +9,24 @@ export default [
         path: '/events',
         name: 'events',
         component: EventView,
-        meta: { requiresAuth: true }
+        meta: { requiresAuth: true ,roles: ['admin','user'] }
     },
     {
         path: '/events/create', // 👈 new route for create
         name: 'event-create',
         component: CreateEventView,
-        meta: { requiresAuth: true }
+        meta: { requiresAuth: true ,roles: ['admin'] }
     },
     {
         path: '/events/update/:id',
         name: 'event-update',
         component: UpdateEventView,
-        meta: { requiresAuth: true }
+        meta: { requiresAuth: true, roles: ['admin']}
     },
     {
         path: '/events/:id',
         name: 'event-details',
         component: EventDetails,
-        meta: { requiresAuth: true }
+        meta: { requiresAuth: true, roles: ['admin', 'user'] }
     }
 ];

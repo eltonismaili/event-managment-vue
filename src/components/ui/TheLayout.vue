@@ -1,20 +1,19 @@
-<template>
-  <div>
-    <TheNavbar />
-    <div class="d-flex">
-      <TheSidebar />
-      <main class="flex-fill p-4 layout-bg">
-        <router-view/>
-        <slot /> <!-- Përmbajtja e faqes shfaqet këtu -->
-      </main>
-    </div>
-  </div>
-</template>
-
 <script setup>
 import TheSidebar from "@/components/ui/TheSidebar.vue";
 import TheNavbar from "@/components/ui/TheNavbar.vue";
 </script>
+<template>
+  <div>
+    <TheNavbar/>
+    <div class="d-flex">
+      <TheSidebar/>
+      <main class="flex-fill p-4 layout-bg">
+        <router-view/>
+        <slot/>
+      </main>
+    </div>
+  </div>
+</template>
 
 <style scoped>
 .layout-bg {

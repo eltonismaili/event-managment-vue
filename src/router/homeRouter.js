@@ -1,4 +1,4 @@
-// eventRouter.js
+
 
 
 import HomeView from "@/components/ui/HomeView.vue";

@@ -1,46 +1,3 @@
-<template>
-  <div class="container mt-5">
-    <h2 class="h4 fw-bold text-primary mb-4">🎟️ Your Tickets</h2>
-
-    <div v-if="tickets.length" class="row g-4">
-      <div
-          v-for="ticket in tickets"
-          :key="ticket.id"
-          class="col-md-6 col-lg-4"
-      >
-        <div
-            class="ticket-card p-4 shadow rounded"
-            :id="'ticket-' + ticket.id"
-        >
-          <div class="ticket-header text-white p-2 rounded-top">
-            <h5 class="mb-0">{{ ticket.name }}</h5>
-            <small>{{ ticket.eventName || 'Unknown Event' }}</small>
-          </div>
-
-          <div class="ticket-body py-3">
-            <p><strong>Quantity:</strong> {{ ticket.quantity }}</p>
-            <p><strong>Price:</strong> ${{ (ticket.price ?? 0).toFixed(2) }}</p>
-            <p><strong>Total:</strong> ${{ (ticket.quantity * (ticket.price ?? 0)).toFixed(2) }}</p>
-            <p><strong>Start:</strong> {{ formatDate(ticket.startDate) }}</p>
-            <p><strong>End:</strong> {{ formatDate(ticket.endDate) }}</p>
-            <p><strong>Buyer:</strong> {{ buyerName }}</p>
-          </div>
-
-          <div class="ticket-footer text-end">
-            <button
-                class="btn btn-outline-primary btn-sm"
-                @click="downloadTicket(ticket.id)"
-            >
-              <i class="bi bi-download"></i> PDF
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div v-else class="alert alert-info">No tickets found.</div>
-  </div>
-</template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
@@ -104,6 +61,49 @@ onMounted(async () => {
   await fetchTickets()
 })
 </script>
+<template>
+  <div class="container mt-5">
+    <h2 class="h4 fw-bold text-primary mb-4">🎟️ Your Tickets</h2>
+
+    <div v-if="tickets.length" class="row g-4">
+      <div
+          v-for="ticket in tickets"
+          :key="ticket.id"
+          class="col-md-6 col-lg-4"
+      >
+        <div
+            class="ticket-card p-4 shadow rounded"
+            :id="'ticket-' + ticket.id"
+        >
+          <div class="ticket-header text-white p-2 rounded-top">
+            <h5 class="mb-0">{{ ticket.name }}</h5>
+            <small>{{ ticket.eventName || 'Unknown Event' }}</small>
+          </div>
+
+          <div class="ticket-body py-3">
+            <p><strong>Quantity:</strong> {{ ticket.quantity }}</p>
+            <p><strong>Price:</strong> ${{ (ticket.price ?? 0).toFixed(2) }}</p>
+            <p><strong>Total:</strong> ${{ (ticket.quantity * (ticket.price ?? 0)).toFixed(2) }}</p>
+            <p><strong>Start:</strong> {{ formatDate(ticket.startDate) }}</p>
+            <p><strong>End:</strong> {{ formatDate(ticket.endDate) }}</p>
+            <p><strong>Buyer:</strong> {{ buyerName }}</p>
+          </div>
+
+          <div class="ticket-footer text-end">
+            <button
+                class="btn btn-outline-primary btn-sm"
+                @click="downloadTicket(ticket.id)"
+            >
+              <i class="bi bi-download"></i> PDF
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div v-else class="alert alert-info">No tickets found.</div>
+  </div>
+</template>
 
 <style scoped>
 .ticket-card {

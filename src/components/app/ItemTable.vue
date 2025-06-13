@@ -1,3 +1,47 @@
+<script setup>
+import { computed } from 'vue'
+import { useAuthStore } from '@/stores/authStore.js'
+
+const authStore = useAuthStore()
+
+
+const canEditDelete = computed(() => {
+  const user = authStore.loggedInUser
+  if (!user) return false
+  return user.role !== 'user'
+})
+
+const props = defineProps({
+  title: String,
+  items: {
+    type: Array,
+    required: true,
+  },
+  columns: {
+    type: Array,
+    required: true,
+  },
+  enableActions: {
+    type: Boolean,
+    default: true,
+  },
+  enableView: {
+    type: Boolean,
+    default: false,
+  },
+  enableUpdate: {
+    type: Boolean,
+    default: false,
+  },
+  enableDelete: {
+    type: Boolean,
+    default: false,
+  },
+})
+
+defineEmits(['click', 'edit', 'delete', 'view'])
+</script>
+
 <template>
   <div class="container mt-4">
     <h2 class="mb-4 text-primary fw-bold">{{ title }}</h2>
@@ -37,7 +81,7 @@
                 View
               </button>
               <button
-                  v-if="enableUpdate"
+                  v-if="enableUpdate && canEditDelete"
                   @click="$emit('edit', item)"
                   class="btn btn-sm btn-outline-warning d-flex align-items-center gap-1"
               >
@@ -45,7 +89,7 @@
                 Edit
               </button>
               <button
-                  v-if="enableDelete"
+                  v-if="enableDelete && canEditDelete"
                   @click="$emit('delete', item)"
                   class="btn btn-sm btn-outline-danger d-flex align-items-center gap-1"
               >
@@ -62,38 +106,6 @@
     <div v-else class="alert alert-info mt-4">No items found.</div>
   </div>
 </template>
-
-<script setup>
-const props = defineProps({
-  title: String,
-  items: {
-    type: Array,
-    required: true,
-  },
-  columns: {
-    type: Array,
-    required: true,
-  },
-  enableActions: {
-    type: Boolean,
-    default: true,
-  },
-  enableView: {
-    type: Boolean,
-    default: false,
-  },
-  enableUpdate: {
-    type: Boolean,
-    default: false,
-  },
-  enableDelete: {
-    type: Boolean,
-    default: false,
-  },
-})
-
-defineEmits(['click', 'edit', 'delete', 'view'])
-</script>
 
 <style scoped>
 .table td,

@@ -1,41 +1,3 @@
-<template>
-  <div class="container mt-4">
-    <h2>Update Venue</h2>
-    <form @submit.prevent="handleSubmit">
-      <div class="mb-3">
-        <label for="name" class="form-label">Venue Name</label>
-        <input id="name" v-model="venue.name" type="text" class="form-control" required />
-      </div>
-
-      <!-- New Capacity Field -->
-      <div class="mb-3">
-        <label for="capacity" class="form-label">Capacity</label>
-        <input id="capacity" v-model.number="venue.capacity" type="number" class="form-control" required min="1" />
-      </div>
-
-      <h4>Address</h4>
-      <div class="mb-3">
-        <label for="street" class="form-label">Street</label>
-        <input id="street" v-model="venue.address.street" type="text" class="form-control" required />
-      </div>
-      <div class="mb-3">
-        <label for="city" class="form-label">City</label>
-        <input id="city" v-model="venue.address.city" type="text" class="form-control" required />
-      </div>
-      <div class="mb-3">
-        <label for="country" class="form-label">Country</label>
-        <input id="country" v-model="venue.address.country" type="text" class="form-control" required />
-      </div>
-      <div class="mb-3">
-        <label for="zipCode" class="form-label">Zip Code</label>
-        <input id="zipCode" v-model="venue.address.zipCode" type="text" class="form-control" required />
-      </div>
-
-      <button type="submit" class="btn btn-primary">Save Changes</button>
-    </form>
-  </div>
-</template>
-
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -117,4 +79,43 @@ const handleSubmit = async () => {
 
 onMounted(fetchVenue)
 </script>
+<template>
+  <div class="container mt-4">
+    <h2>Update Venue</h2>
+    <form @submit.prevent="handleSubmit">
+      <div class="mb-3">
+        <label for="name" class="form-label">Venue Name</label>
+        <input id="name" v-model="venue.name" type="text" class="form-control" required />
+      </div>
+
+
+      <div class="mb-3">
+        <label for="capacity" class="form-label">Capacity</label>
+        <input id="capacity" v-model.number="venue.capacity" type="number" class="form-control" required min="1" />
+      </div>
+
+      <h4>Address</h4>
+      <div class="mb-3">
+        <label for="street" class="form-label">Street</label>
+        <input id="street" v-model="venue.address.street" type="text" class="form-control" required />
+      </div>
+      <div class="mb-3">
+        <label for="city" class="form-label">City</label>
+        <input id="city" v-model="venue.address.city" type="text" class="form-control" required />
+      </div>
+      <div class="mb-3">
+        <label for="country" class="form-label">Country</label>
+        <input id="country" v-model="venue.address.country" type="text" class="form-control" required />
+      </div>
+      <div class="mb-3">
+        <label for="zipCode" class="form-label">Zip Code</label>
+        <input id="zipCode" v-model="venue.address.zipCode" type="text" class="form-control" required />
+      </div>
+
+      <button type="submit" class="btn btn-primary">Save Changes</button>
+    </form>
+  </div>
+</template>
+
+
 

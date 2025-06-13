@@ -1,22 +1,14 @@
-<template>
-  <ItemList
-      title="Categories"
-      :items="categories"
-      :enableEdit="true"
-      :enableDelete="true"
-      @click="goToDetails"
-      @edit="editCategory"
-      @delete="deleteCategory"
-  />
-</template>
-
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import CategoryService from '@/services/categoryService'
-import ItemList from "@/components/app/ItemList.vue";
+import ItemList from "@/components/app/ItemList.vue"
+import Swal from 'sweetalert2'
+import { useAuthStore } from '@/stores/authStore.js'
 
 const router = useRouter()
+const authStore = useAuthStore()
+
 const categories = ref([])
 
 const fetchCategories = async () => {
@@ -30,8 +22,6 @@ const goToDetails = (category) => {
 const editCategory = (category) => {
   router.push(`/categories/update/${category.id}`)
 }
-
-import Swal from 'sweetalert2'
 
 const deleteCategory = async (category) => {
   const result = await Swal.fire({
@@ -66,5 +56,21 @@ const deleteCategory = async (category) => {
 }
 
 
+const canEditOrDelete = computed(() => {
+  return authStore.loggedInUser?.role !== 'USER'
+})
+
 onMounted(fetchCategories)
 </script>
+
+<template>
+  <ItemList
+      title="Categories"
+      :items="categories"
+      :enableEdit="canEditOrDelete"
+      :enableDelete="canEditOrDelete"
+      @click="goToDetails"
+      @edit="editCategory"
+      @delete="deleteCategory"
+  />
+</template>

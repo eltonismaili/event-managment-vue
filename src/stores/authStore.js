@@ -7,17 +7,17 @@ export const useAuthStore = defineStore("auth", () => {
     const token = ref(localStorage.getItem("token") || null);
     const user = ref(null);
 
-    // Function to decode token and load user info
+
     const loadUserFromToken = () => {
         if (token.value) {
             user.value = jwtDecode(token.value);
         }
     };
 
-    // Call it once when store initializes
+
     loadUserFromToken();
 
-    // 🔐 LOGIN
+
     const logIn = async (userData) => {
         const response = await client.post("auth/login", userData);
 
@@ -28,14 +28,14 @@ export const useAuthStore = defineStore("auth", () => {
         }
     };
 
-    // 🔓 LOGOUT
+
     const logOut = () => {
         token.value = null;
         user.value = null;
         localStorage.removeItem("token");
     };
 
-    // 🆕 SIGNUP
+
     const signUp = async (userData) => {
         const response = await client.post("users/register", userData);
         return response.data;
@@ -48,6 +48,6 @@ export const useAuthStore = defineStore("auth", () => {
         logOut,
         signUp,
         isLoggedIn,
-        loggedInUser: user, // reactive ref
+        loggedInUser: user,
     };
 });

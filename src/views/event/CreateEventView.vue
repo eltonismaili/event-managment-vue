@@ -1,110 +1,3 @@
-<template>
-  <div class="container mt-5">
-    <h2 class="mb-4">Create New Event</h2>
-
-    <form @submit.prevent="handleSubmit">
-      <!-- Event Name -->
-      <div class="mb-3">
-        <label for="name" class="form-label">Event Name</label>
-        <input id="name" v-model="form.name" type="text" class="form-control" required />
-      </div>
-
-      <!-- Description -->
-      <div class="mb-3">
-        <label for="description" class="form-label">Description</label>
-        <textarea id="description" v-model="form.description" class="form-control" rows="3" required></textarea>
-      </div>
-
-      <!-- Start Date -->
-      <div class="mb-3">
-        <label for="startDate" class="form-label">Start Date</label>
-        <input id="startDate" v-model="form.startDate" type="datetime-local" class="form-control" required />
-      </div>
-
-      <!-- End Date -->
-      <div class="mb-3">
-        <label for="endDate" class="form-label">End Date</label>
-        <input id="endDate" v-model="form.endDate" type="datetime-local" class="form-control" required />
-      </div>
-
-      <!-- Image Upload -->
-      <div class="mb-3">
-        <label for="imageFile" class="form-label">Event Image</label>
-        <input id="imageFile" type="file" class="form-control" @change="handleFileUpload" accept="image/*" />
-      </div>
-
-      <!-- Ticket Price -->
-      <div class="mb-3">
-        <label for="ticketPrice" class="form-label">Ticket Price (€)</label>
-        <input id="ticketPrice" v-model.number="form.ticketPrice" type="number" class="form-control" placeholder="e.g., 20" required min="0" step="0.01" />
-      </div>
-
-      <!-- Event Type -->
-      <div class="mb-3">
-        <label for="eventType" class="form-label">Event Type</label>
-        <select id="eventType" v-model="form.eventType" class="form-select" required>
-          <option value="CONCERT">Concert</option>
-          <option value="CONFERENCE">Conference</option>
-          <option value="MATCH">Match</option>
-          <option value="DEBATE">Debate</option>
-          <option value="WORKSHOP">Workshop</option>
-          <option value="OTHER">Other</option>
-        </select>
-      </div>
-
-      <!-- Category -->
-      <div class="mb-3">
-        <label for="category" class="form-label">Category</label>
-        <select id="category" v-model="form.categoryId" class="form-select" required @change="onCategoryChange">
-          <option value="" disabled>Select category</option>
-          <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
-          <option value="new">-- Create New Category --</option>
-        </select>
-      </div>
-
-      <div v-if="creatingNewCategory" class="mb-3">
-        <label for="newCategory" class="form-label">New Category Name</label>
-        <input id="newCategory" v-model="newCategoryName" type="text" class="form-control" placeholder="Enter new category name" />
-        <button type="button" class="btn btn-secondary mt-2" @click="createCategory">Create Category</button>
-      </div>
-
-      <!-- Venue -->
-      <div class="mb-3">
-        <label for="venue" class="form-label">Venue</label>
-        <select id="venue" v-model="form.venueId" class="form-select" required @change="onVenueChange">
-          <option value="" disabled>Select venue</option>
-          <option v-for="venue in venues" :key="venue.id" :value="venue.id">{{ venue.name }}</option>
-          <option value="new">-- Create New Venue --</option>
-        </select>
-      </div>
-
-      <div v-if="creatingNewVenue" class="mb-3">
-        <label for="newVenueName" class="form-label">Venue Name</label>
-        <input id="newVenueName" v-model="newVenue.name" type="text" class="form-control" placeholder="Venue name" />
-
-        <label for="venueCapacity" class="form-label mt-3">Venue Capacity</label>
-        <input id="venueCapacity" v-model.number="newVenue.capacity" type="number" class="form-control" placeholder="Enter capacity" min="1" required />
-
-        <label class="form-label mt-3">Address</label>
-        <input v-model="newVenue.address.street" type="text" class="form-control mb-2" placeholder="Street" />
-        <input v-model="newVenue.address.city" type="text" class="form-control mb-2" placeholder="City" />
-        <input v-model="newVenue.address.zipCode" type="text" class="form-control mb-2" placeholder="Zip Code" />
-        <input v-model="newVenue.address.country" type="text" class="form-control" placeholder="Country" />
-
-        <button type="button" class="btn btn-secondary mt-2" @click="createVenue">Create Venue</button>
-      </div>
-
-      <!-- Submit -->
-      <button type="submit" class="btn btn-primary" :disabled="isSubmitting">
-        {{ isSubmitting ? 'Creating...' : 'Create Event' }}
-      </button>
-
-      <!-- Error Message -->
-      <div v-if="error" class="alert alert-danger mt-3">{{ error }}</div>
-    </form>
-  </div>
-</template>
-
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
@@ -269,14 +162,14 @@ async function handleSubmit() {
 
   const formData = new FormData()
 
-  // Append the event data as a JSON blob under "data"
+
   const eventPayload = { ...form.value }
   const eventBlob = new Blob([JSON.stringify(eventPayload)], {
     type: 'application/json',
   })
   formData.append('data', eventBlob)
 
-  // Append image file as "image"
+
   if (imageFile.value) {
     formData.append('image', imageFile.value)
   }
@@ -299,6 +192,14 @@ async function handleSubmit() {
     isSubmitting.value = false
   }
 }
+const eventTypes = [
+  { value: 'CONCERT', label: 'Concert' },
+  { value: 'CONFERENCE', label: 'Conference' },
+  { value: 'MATCH', label: 'Match' },
+  { value: 'DEBATE', label: 'Debate' },
+  { value: 'WORKSHOP', label: 'Workshop' },
+  { value: 'OTHER', label: 'Other' }
+]
 </script>
 
 <style scoped>
@@ -306,3 +207,106 @@ async function handleSubmit() {
   max-width: 600px;
 }
 </style>
+<template>
+  <div class="container mt-5">
+    <h2 class="mb-4">Create New Event</h2>
+
+    <form @submit.prevent="handleSubmit">
+
+      <div class="mb-3">
+        <label for="name" class="form-label">Event Name</label>
+        <input id="name" v-model="form.name" type="text" class="form-control" required />
+      </div>
+
+
+      <div class="mb-3">
+        <label for="description" class="form-label">Description</label>
+        <textarea id="description" v-model="form.description" class="form-control" rows="3" required></textarea>
+      </div>
+
+
+      <div class="mb-3">
+        <label for="startDate" class="form-label">Start Date</label>
+        <input id="startDate" v-model="form.startDate" type="datetime-local" class="form-control" required />
+      </div>
+
+
+      <div class="mb-3">
+        <label for="endDate" class="form-label">End Date</label>
+        <input id="endDate" v-model="form.endDate" type="datetime-local" class="form-control" required />
+      </div>
+
+
+      <div class="mb-3">
+        <label for="imageFile" class="form-label">Event Image</label>
+        <input id="imageFile" type="file" class="form-control" @change="handleFileUpload" accept="image/*" />
+      </div>
+
+
+      <div class="mb-3">
+        <label for="ticketPrice" class="form-label">Ticket Price (€)</label>
+        <input id="ticketPrice" v-model.number="form.ticketPrice" type="number" class="form-control" placeholder="e.g., 20" required min="0" step="0.01" />
+      </div>
+
+
+      <div class="mb-3">
+        <label for="eventType" class="form-label">Event Type</label>
+        <select id="eventType" v-model="form.eventType" class="form-select" required>
+          <option v-for="type in eventTypes" :key="type.value" :value="type.value">
+            {{ type.label }}
+          </option>
+        </select>
+      </div>
+
+
+      <div class="mb-3">
+        <label for="category" class="form-label">Category</label>
+        <select id="category" v-model="form.categoryId" class="form-select" required @change="onCategoryChange">
+          <option value="" disabled>Select category</option>
+          <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
+          <option value="new">-- Create New Category --</option>
+        </select>
+      </div>
+
+      <div v-if="creatingNewCategory" class="mb-3">
+        <label for="newCategory" class="form-label">New Category Name</label>
+        <input id="newCategory" v-model="newCategoryName" type="text" class="form-control" placeholder="Enter new category name" />
+        <button type="button" class="btn btn-secondary mt-2" @click="createCategory">Create Category</button>
+      </div>
+
+
+      <div class="mb-3">
+        <label for="venue" class="form-label">Venue</label>
+        <select id="venue" v-model="form.venueId" class="form-select" required @change="onVenueChange">
+          <option value="" disabled>Select venue</option>
+          <option v-for="venue in venues" :key="venue.id" :value="venue.id">{{ venue.name }}</option>
+          <option value="new">-- Create New Venue --</option>
+        </select>
+      </div>
+
+      <div v-if="creatingNewVenue" class="mb-3">
+        <label for="newVenueName" class="form-label">Venue Name</label>
+        <input id="newVenueName" v-model="newVenue.name" type="text" class="form-control" placeholder="Venue name" />
+
+        <label for="venueCapacity" class="form-label mt-3">Venue Capacity</label>
+        <input id="venueCapacity" v-model.number="newVenue.capacity" type="number" class="form-control" placeholder="Enter capacity" min="1" required />
+
+        <label class="form-label mt-3">Address</label>
+        <input v-model="newVenue.address.street" type="text" class="form-control mb-2" placeholder="Street" />
+        <input v-model="newVenue.address.city" type="text" class="form-control mb-2" placeholder="City" />
+        <input v-model="newVenue.address.zipCode" type="text" class="form-control mb-2" placeholder="Zip Code" />
+        <input v-model="newVenue.address.country" type="text" class="form-control" placeholder="Country" />
+
+        <button type="button" class="btn btn-secondary mt-2" @click="createVenue">Create Venue</button>
+      </div>
+
+
+      <button type="submit" class="btn btn-primary" :disabled="isSubmitting">
+        {{ isSubmitting ? 'Creating...' : 'Create Event' }}
+      </button>
+
+
+      <div v-if="error" class="alert alert-danger mt-3">{{ error }}</div>
+    </form>
+  </div>
+</template>

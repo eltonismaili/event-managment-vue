@@ -1,24 +1,13 @@
-<template>
-  <ItemList
-      title="Venues"
-      :items="venues"
-      :enableView="true"
-      :enableEdit="true"
-      :enableDelete="true"
-      @click="goToDetails"
-      @view="goToDetails"
-      @edit="editVenue"
-      @delete="deleteVenue"
-  />
-</template>
-
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import VenueService from '@/services/venueService'
-import ItemList from "@/components/app/ItemList.vue";
+import ItemList from "@/components/app/ItemList.vue"
+import Swal from 'sweetalert2'
+import { useAuthStore } from '@/stores/authStore.js'
 
 const router = useRouter()
+const authStore = useAuthStore()
 const venues = ref([])
 
 const fetchVenues = async () => {
@@ -32,8 +21,6 @@ const goToDetails = (venue) => {
 const editVenue = (venue) => {
   router.push(`/venues/update/${venue.id}`)
 }
-
-import Swal from 'sweetalert2'
 
 const deleteVenue = async (venue) => {
   const result = await Swal.fire({
@@ -58,6 +45,23 @@ const deleteVenue = async (venue) => {
   }
 }
 
+const canEditOrDelete = computed(() => {
+  return authStore.loggedInUser?.role !== 'USER'
+})
 
 onMounted(fetchVenues)
 </script>
+
+<template>
+  <ItemList
+      title="Venues"
+      :items="venues"
+      :enableView="true"
+      :enableEdit="canEditOrDelete"
+      :enableDelete="canEditOrDelete"
+      @click="goToDetails"
+      @view="goToDetails"
+      @edit="editVenue"
+      @delete="deleteVenue"
+  />
+</template>
